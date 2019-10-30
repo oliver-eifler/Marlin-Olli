@@ -2358,6 +2358,14 @@
 //#define EXPERIMENTAL_I2CBUS
 #define I2C_SLAVE_ADDRESS  0 // Set a value from 8 to 127 to act as a slave
 
+/**
+ * Olli I2C Bus Scanner
+ * activated by EXPERIMENTAL_I2CBUS or EXPERIMENTAL_I2CBUS_SCANNER without other i2c experimental features
+ * 
+ * M262 - Scan I2C Bus for connected devices
+ */
+#define EXPERIMENTAL_I2CBUS_SCANNER
+
 // @section extras
 
 /**

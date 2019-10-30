@@ -627,7 +627,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 260: M260(); break;                                  // M260: Send data to an i2c slave
         case 261: M261(); break;                                  // M261: Request data from an i2c slave
       #endif
-
+      #if ANY(EXPERIMENTAL_I2CBUS_SCANNER,EXPERIMENTAL_I2CBUS)
+        case 262: M262();break;
+      #endif
+      
       #if ENABLED(PREVENT_COLD_EXTRUSION)
         case 302: M302(); break;                                  // M302: Allow cold extrudes (set the minimum extrude temperature)
       #endif
