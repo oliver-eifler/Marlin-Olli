@@ -416,6 +416,8 @@
   #error "BABYSTEP_MULTIPLICATOR is now BABYSTEP_MULTIPLICATOR_[XY|Z]. Please update Configuration_adv.h."
 #elif defined(LULZBOT_TOUCH_UI)
   #error "LULZBOT_TOUCH_UI is now TOUCH_UI_FTDI_EVE. Please update your configuration."
+#elif defined(PS_DEFAULT_OFF)
+  #error "PS_DEFAULT_OFF is now PSU_DEFAULT_OFF. Please update your configuration."
 #endif
 
 #define BOARD_MKS_13        -1000
@@ -1603,7 +1605,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 /**
  * LED Backlight Timeout
  */
-#if defined(LED_BACKLIGHT_TIMEOUT) && !(EITHER(FYSETC_MINI_12864_2_0, FYSETC_MINI_12864_2_1) && ENABLED(PSU_CONTROL))
+#if defined(LED_BACKLIGHT_TIMEOUT) && !(ENABLED(PSU_CONTROL) && EITHER(FYSETC_MINI_12864_2_0, FYSETC_MINI_12864_2_1))
   #error "LED_BACKLIGHT_TIMEOUT requires a FYSETC Mini Panel and a Power Switch."
 #endif
 
@@ -2484,6 +2486,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
     #error "PSU_CONTROL requires PSU_ACTIVE_HIGH to be defined as 'true' or 'false'."
   #elif !PIN_EXISTS(PS_ON)
     #error "PSU_CONTROL requires PS_ON_PIN."
+  #elif defined(PSU_POWERUP_DELAY) && ENABLED(AUTO_POWER_CONTROL)
+    #error "PSU_POWERUP_DELAY has no effect with AUTO_POWER_CONTROL enabled."
   #endif
 #elif ENABLED(AUTO_POWER_CONTROL)
   #error "AUTO_POWER_CONTROL requires PSU_CONTROL."
