@@ -960,7 +960,7 @@
 #define STATUS_MESSAGE_SCROLLING
 
 // On the Info Screen, display XY with one decimal place when possible
-#define LCD_DECIMAL_SMALL_XY
+//#define LCD_DECIMAL_SMALL_XY
 
 // The timeout (in ms) to return to the status screen from sub-menus
 //#define LCD_TIMEOUT_TO_STATUS 15000
@@ -1194,7 +1194,7 @@
   #define XYZ_HOLLOW_FRAME
 
   // Enable to save many cycles by drawing a hollow frame on Menu Screens
-  #define MENU_HOLLOW_FRAME
+  //#define MENU_HOLLOW_FRAME
 
   // A bigger font is available for edit items. Costs 3120 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
@@ -1202,7 +1202,7 @@
 
   // A smaller font may be used on the Info Screen. Costs 2300 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
-  #define USE_SMALL_INFOFONT
+  //#define USE_SMALL_INFOFONT
 
   // Enable this option and reduce the value to optimize screen updates.
   // The normal delay is 10µs. Use the lowest value that still gives a reliable display.
@@ -1246,12 +1246,12 @@
   #define STATUS_FAN_FRAMES 3         // :[0,1,2,3,4] Number of fan animation frames
   #define STATUS_HEAT_PERCENT         // Show heating in a progress bar
   #define BOOT_MARLIN_LOGO_SMALL      // Show a smaller Marlin logo on the Boot Screen (saving 399 bytes of flash)
-  //#define BOOT_MARLIN_LOGO_ANIMATED   // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
+  #define BOOT_MARLIN_LOGO_ANIMATED   // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
 
   // Frivolous Game Options
-  //#define MARLIN_BRICKOUT
-  //#define MARLIN_INVADERS
-  //#define MARLIN_SNAKE
+  #define MARLIN_BRICKOUT
+  #define MARLIN_INVADERS
+  #define MARLIN_SNAKE
   //#define GAMES_EASTER_EGG          // Add extra blank lines above the "Games" sub-menu
 
 #endif // HAS_GRAPHICAL_LCD
@@ -1470,7 +1470,7 @@
  * See http://marlinfw.org/docs/features/lin_advance.html for full instructions.
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
-//#define LIN_ADVANCE
+#define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
   #define LIN_ADVANCE_K 0       // Unit: mm compression per 1mm/s extruder speed
@@ -1579,7 +1579,7 @@
 //
 // G2/G3 Arc Support
 //
-//#define ARC_SUPPORT               // Disable this feature to save ~3226 bytes
+#define ARC_SUPPORT               // Disable this feature to save ~3226 bytes
 #if ENABLED(ARC_SUPPORT)
   #define MM_PER_ARC_SEGMENT      1 // (mm) Length (or minimum length) of each arc segment
   //#define ARC_SEGMENTS_PER_R    1 // Max segment length, MM_PER = Min
