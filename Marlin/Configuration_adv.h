@@ -2961,5 +2961,6 @@
 //#define I2C_EEPROM
 //#define E2END 0x7FFF
 
-//Timer Issue ???? 
+//Timer Issue ???? from 9 to 6
 #define STEP_TIMER 6
+
