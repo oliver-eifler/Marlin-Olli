@@ -2960,3 +2960,6 @@
 //olli external eeprom
 //#define I2C_EEPROM
 //#define E2END 0x7FFF
+
+//Timer Issue ???? 
+#define STEP_TIMER 6
