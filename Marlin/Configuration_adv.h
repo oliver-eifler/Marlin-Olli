@@ -2993,6 +2993,7 @@
 //#define I2C_EEPROM
 //#define E2END 0x7FFF
 
-//Timer Issue ???? from 9 to 6
+//fix STM4xx timers
 #define STEP_TIMER 6
+#define TEMP_TIMER 14
 
