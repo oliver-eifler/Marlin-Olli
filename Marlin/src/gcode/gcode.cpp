@@ -28,6 +28,10 @@
 #include "gcode.h"
 GcodeSuite gcode;
 
+#if ENABLED(WIFI_CUSTOM_COMMAND)
+  extern bool wifi_custom_command(char * const command_ptr);
+#endif
+
 #include "parser.h"
 #include "queue.h"
 #include "../module/motion.h"
@@ -782,7 +786,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         #endif
       #endif
 
-      #if HAS_DRIVER(L6470)
+      #if HAS_L64XX
         case 122: M122(); break;                                   // M122: Report status
         case 906: M906(); break;                                   // M906: Set or get motor drive level
         case 916: M916(); break;                                   // M916: L6470 tuning: Increase drive level until thermal warning
@@ -841,7 +845,11 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
     case 'T': T(parser.codenum); break;                           // Tn: Tool Change
 
-    default: parser.unknown_command_error();
+    default:
+      #if ENABLED(WIFI_CUSTOM_COMMAND)
+        if (wifi_custom_command(parser.command_ptr)) break;
+      #endif
+      parser.unknown_command_error();
   }
 
   if (!no_ok) queue.ok_to_send();
