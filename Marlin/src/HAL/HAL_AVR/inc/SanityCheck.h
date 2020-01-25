@@ -59,3 +59,7 @@
 #if HAS_TRINAMIC && (ENABLED(ENDSTOP_INTERRUPTS_FEATURE) && !ENABLED(FORCE_NO_SW_SERIAL))
   #error "TMCStepper includes SoftwareSerial.h which is incompatible with ENDSTOP_INTERRUPTS_FEATURE. Disable ENDSTOP_INTERRUPTS_FEATURE to continue."
 #endif
+
+#if TMC_HAS_SW_SERIAL && ENABLED(MONITOR_DRIVER_STATUS)
+  #error "MONITOR_DRIVER_STATUS causes performance issues when used with SoftwareSerial-connected drivers. Disable MONITOR_DRIVER_STATUS or use hardware serial to continue."
+#endif
