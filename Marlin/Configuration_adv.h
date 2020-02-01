@@ -672,7 +672,6 @@
   // If not defined, probe limits will be used.
   // Override with 'M422 S<index> X<pos> Y<pos>'
   //#define Z_STEPPER_ALIGN_XY { {  10, 190 }, { 100,  10 }, { 190, 190 } }
-  #define Z_STEPPER_ALIGN_XY { {  15, 105 }, { 195,  105 }}
 
   /**
    * Orientation for the automatically-calculated probe positions.
@@ -695,7 +694,7 @@
    *
    */
   #ifndef Z_STEPPER_ALIGN_XY
-    //#define Z_STEPPERS_ORIENTATION 0
+    #define Z_STEPPERS_ORIENTATION 0
   #endif
 
   // Provide Z stepper positions for more rapid convergence in bed alignment.
