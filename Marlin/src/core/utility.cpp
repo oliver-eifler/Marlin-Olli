@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -34,6 +34,18 @@ void safe_delay(millis_t ms) {
   delay(ms);
   thermalManager.manage_heater(); // This keeps us safe if too many small safe_delay() calls are made
 }
+
+// A delay to provide brittle hosts time to receive bytes
+#if ENABLED(SERIAL_OVERRUN_PROTECTION)
+
+  #include "../gcode/gcode.h" // for set_autoreport_paused
+
+  void serial_delay(const millis_t ms) {
+    const bool was = gcode.set_autoreport_paused(true);
+    safe_delay(ms);
+    gcode.set_autoreport_paused(was);
+  }
+#endif
 
 #if ENABLED(DEBUG_LEVELING_FEATURE)
 
