@@ -204,10 +204,6 @@ bool wait_for_heatup = true;
   bool wait_for_user; // = false;
 #endif
 
-#if HAS_AUTO_REPORTING || ENABLED(HOST_KEEPALIVE_FEATURE)
-  bool suspend_auto_report; // = false
-#endif
-
 // Inactivity shutdown
 millis_t max_inactive_time, // = 0
          stepper_inactive_time = (DEFAULT_STEPPER_DEACTIVE_TIME) * 1000UL;
@@ -345,7 +341,7 @@ void disable_all_steppers() {
 
   void event_probe_recover() {
     #if ENABLED(HOST_PROMPT_SUPPORT)
-      host_prompt_do(PROMPT_INFO, PSTR("G29 Retrying"), PSTR("Dismiss"));
+      host_prompt_do(PROMPT_INFO, PSTR("G29 Retrying"), DISMISS_STR);
     #endif
     #ifdef ACTION_ON_G29_RECOVER
       host_action(PSTR(ACTION_ON_G29_RECOVER));
@@ -432,7 +428,7 @@ void startOrResumeJob() {
  *  - Pulse FET_SAFETY_PIN if it exists
  */
 
-void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
+inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 
   #if HAS_FILAMENT_SENSOR
     runout.run();
@@ -697,7 +693,7 @@ void idle(
   #endif
 
   #if HAS_AUTO_REPORTING
-    if (!suspend_auto_report) {
+    if (!gcode.autoreport_paused) {
       #if ENABLED(AUTO_REPORT_TEMPERATURES)
         thermalManager.auto_report_temperatures();
       #endif
@@ -798,7 +794,6 @@ void stop() {
   #endif
 
   if (IsRunning()) {
-    queue.stop();
     SERIAL_ERROR_MSG(MSG_ERR_STOPPED);
     LCD_MESSAGEPGM(MSG_STOPPED);
     safe_delay(350);       // allow enough time for messages to get out before stopping
