@@ -2564,7 +2564,7 @@ void Stepper::report_positions() {
           #elif CORE_IS_XZ
             BABYSTEP_CORE(X, Z, 0, direction, 0);
           #else
-            BABYSTEP_AXIS(X, 0, direction, 0);
+            BABYSTEP_AXIS(X, 0, direction);
           #endif
           break;
 
