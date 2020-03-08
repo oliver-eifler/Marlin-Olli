@@ -110,7 +110,7 @@
   #include "feature/I2CPositionEncoder.h"
 #endif
 
-#if HAS_TRINAMIC && DISABLED(PSU_DEFAULT_OFF)
+#if HAS_TRINAMIC_CONFIG && DISABLED(PSU_DEFAULT_OFF)
   #include "feature/tmc_util.h"
 #endif
 
@@ -192,7 +192,15 @@ const char NUL_STR[] PROGMEM = "",
            SP_X_STR[] PROGMEM = " X",
            SP_Y_STR[] PROGMEM = " Y",
            SP_Z_STR[] PROGMEM = " Z",
-           SP_E_STR[] PROGMEM = " E";
+           SP_E_STR[] PROGMEM = " E",
+              X_LBL[] PROGMEM =  "X:",
+              Y_LBL[] PROGMEM =  "Y:",
+              Z_LBL[] PROGMEM =  "Z:",
+              E_LBL[] PROGMEM =  "E:",
+           SP_X_LBL[] PROGMEM = " X:",
+           SP_Y_LBL[] PROGMEM = " Y:",
+           SP_Z_LBL[] PROGMEM = " Z:",
+           SP_E_LBL[] PROGMEM = " E:";
 
 bool Running = true;
 
@@ -233,11 +241,8 @@ void setup_powerhold() {
     OUT_WRITE(SUICIDE_PIN, !SUICIDE_PIN_INVERTING);
   #endif
   #if ENABLED(PSU_CONTROL)
-    #if ENABLED(PSU_DEFAULT_OFF)
-      powersupply_on = true;  PSU_OFF();
-    #else
-      powersupply_on = false; PSU_ON();
-    #endif
+    powersupply_on = ENABLED(PSU_DEFAULT_OFF);
+    if (ENABLED(PSU_DEFAULT_OFF)) PSU_OFF(); else PSU_ON();
   #endif
 }
 
@@ -278,7 +283,7 @@ bool pin_is_protected(const pin_t pin) {
 }
 
 void protected_pin_err() {
-  SERIAL_ERROR_MSG(MSG_ERR_PROTECTED_PIN);
+  SERIAL_ERROR_MSG(STR_ERR_PROTECTED_PIN);
 }
 
 void quickstop_stepper() {
@@ -390,8 +395,8 @@ void startOrResumeJob() {
 
 #if ENABLED(SDSUPPORT)
 
-  void abortSDPrinting() {
-    card.stopSDPrint(
+  inline void abortSDPrinting() {
+    card.endFilePrint(
       #if SD_RESORT
         true
       #endif
@@ -412,10 +417,52 @@ void startOrResumeJob() {
     #endif
   }
 
-#endif
+  inline void finishSDPrinting() {
+    bool did_state = true;
+    switch (card.sdprinting_done_state) {
+
+      #if HAS_RESUME_CONTINUE                   // Display "Click to Continue..."
+        case 1:                                 // 30 min timeout with LCD, 1 min without
+          did_state = queue.enqueue_P(PSTR("M0Q1S" TERN(HAS_LCD_MENU, "1800", "60")));
+          break;
+      #endif
+
+      case 2: print_job_timer.stop(); break;
+
+      case 3:
+        did_state = print_job_timer.duration() < 60 || queue.enqueue_P(PSTR("M31"));
+        break;
+
+      case 4:
+        #if ENABLED(POWER_LOSS_RECOVERY)
+          recovery.purge();
+        #endif
+
+        #if ENABLED(SD_FINISHED_STEPPERRELEASE) && defined(SD_FINISHED_RELEASECOMMAND)
+          planner.finish_and_disable();
+        #endif
+
+        #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
+          ui.set_progress_done();
+        #endif
+
+        #if ENABLED(SD_REPRINT_LAST_SELECTED_FILE)
+          ui.reselect_last_file();
+        #endif
+
+        SERIAL_ECHOLNPGM(STR_FILE_PRINTED);
+
+      default:
+        did_state = false;
+        card.sdprinting_done_state = 0;
+    }
+    if (did_state) ++card.sdprinting_done_state;
+  }
+
+#endif // SDSUPPORT
 
 /**
- * Manage several activities:
+ * Minimal management of Marlin's core activities:
  *  - Check for Filament Runout
  *  - Keep the command buffer full
  *  - Check for maximum inactive time between commands
@@ -440,36 +487,24 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 
   if (max_inactive_time && ELAPSED(ms, gcode.previous_move_ms + max_inactive_time)) {
     SERIAL_ERROR_START();
-    SERIAL_ECHOLNPAIR(MSG_KILL_INACTIVE_TIME, parser.command_ptr);
+    SERIAL_ECHOLNPAIR(STR_KILL_INACTIVE_TIME, parser.command_ptr);
     kill();
   }
 
   // Prevent steppers timing-out in the middle of M600
-  #if BOTH(ADVANCED_PAUSE_FEATURE, PAUSE_PARK_NO_STEPPER_TIMEOUT)
-    #define MOVE_AWAY_TEST !did_pause_print
-  #else
-    #define MOVE_AWAY_TEST true
-  #endif
+  #define STAY_TEST (BOTH(ADVANCED_PAUSE_FEATURE, PAUSE_PARK_NO_STEPPER_TIMEOUT) && did_pause_print)
 
   if (stepper_inactive_time) {
     static bool already_shutdown_steppers; // = false
     if (planner.has_blocks_queued())
       gcode.reset_stepper_timeout();
-    else if (MOVE_AWAY_TEST && !ignore_stepper_queue && ELAPSED(ms, gcode.previous_move_ms + stepper_inactive_time)) {
+    else if (!STAY_TEST && !ignore_stepper_queue && ELAPSED(ms, gcode.previous_move_ms + stepper_inactive_time)) {
       if (!already_shutdown_steppers) {
         already_shutdown_steppers = true;  // L6470 SPI will consume 99% of free time without this
-        #if ENABLED(DISABLE_INACTIVE_X)
-          DISABLE_AXIS_X();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_Y)
-          DISABLE_AXIS_Y();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_Z)
-          DISABLE_AXIS_Z();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_E)
-          disable_e_steppers();
-        #endif
+        if (ENABLED(DISABLE_INACTIVE_X)) DISABLE_AXIS_X();
+        if (ENABLED(DISABLE_INACTIVE_Y)) DISABLE_AXIS_Y();
+        if (ENABLED(DISABLE_INACTIVE_Z)) DISABLE_AXIS_Z();
+        if (ENABLED(DISABLE_INACTIVE_E)) disable_e_steppers();
         #if HAS_LCD_MENU && ENABLED(AUTO_BED_LEVELING_UBL)
           if (ubl.lcd_map_control) {
             ubl.lcd_map_control = false;
@@ -505,7 +540,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
     // KILL the machine
     // ----------------------------------------------------------------
     if (killCount >= KILL_DELAY) {
-      SERIAL_ERROR_MSG(MSG_KILL_BUTTON);
+      SERIAL_ERROR_MSG(STR_KILL_BUTTON);
       kill();
     }
   #endif
@@ -594,7 +629,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
       // travel moves have been received so enact them
       delayed_move_time = 0xFFFFFFFFUL; // force moves to be done
       destination = current_position;
-      prepare_move_to_destination();
+      prepare_line_to_destination();
     }
   #endif
 
@@ -723,7 +758,7 @@ void idle(
 void kill(PGM_P const lcd_error/*=nullptr*/, PGM_P const lcd_component/*=nullptr*/, const bool steppers_off/*=false*/) {
   thermalManager.disable_all_heaters();
 
-  SERIAL_ERROR_MSG(MSG_ERR_KILLED);
+  SERIAL_ERROR_MSG(STR_ERR_KILLED);
 
   #if HAS_DISPLAY
     ui.kill_screen(lcd_error ?: GET_TEXT(MSG_KILLED), lcd_component ?: NUL_STR);
@@ -794,7 +829,7 @@ void stop() {
   #endif
 
   if (IsRunning()) {
-    SERIAL_ERROR_MSG(MSG_ERR_STOPPED);
+    SERIAL_ERROR_MSG(STR_ERR_STOPPED);
     LCD_MESSAGEPGM(MSG_STOPPED);
     safe_delay(350);       // allow enough time for messages to get out before stopping
     Running = false;
@@ -818,6 +853,7 @@ void stop() {
  *    • Digipot I2C
  *    • Z probe sled
  *    • status LEDs
+ *    • Max7219
  */
 void setup() {
 
@@ -829,10 +865,6 @@ void setup() {
 
   #if ENABLED(SMART_EFFECTOR) && PIN_EXISTS(SMART_EFFECTOR_MOD)
     OUT_WRITE(SMART_EFFECTOR_MOD_PIN, LOW);   // Put Smart Effector into NORMAL mode
-  #endif
-
-  #if ENABLED(MAX7219_DEBUG)
-    max7219.init();
   #endif
 
   #if ENABLED(DISABLE_DEBUG)
@@ -900,11 +932,11 @@ void setup() {
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
   byte mcu = HAL_get_reset_source();
-  if (mcu &  1) SERIAL_ECHOLNPGM(MSG_POWERUP);
-  if (mcu &  2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
-  if (mcu &  4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
-  if (mcu &  8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
-  if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
+  if (mcu &  1) SERIAL_ECHOLNPGM(STR_POWERUP);
+  if (mcu &  2) SERIAL_ECHOLNPGM(STR_EXTERNAL_RESET);
+  if (mcu &  4) SERIAL_ECHOLNPGM(STR_BROWNOUT_RESET);
+  if (mcu &  8) SERIAL_ECHOLNPGM(STR_WATCHDOG_RESET);
+  if (mcu & 32) SERIAL_ECHOLNPGM(STR_SOFTWARE_RESET);
   HAL_clear_reset_source();
 
   serialprintPGM(GET_TEXT(MSG_MARLIN));
@@ -914,15 +946,15 @@ void setup() {
 
   #if defined(STRING_DISTRIBUTION_DATE) && defined(STRING_CONFIG_H_AUTHOR)
     SERIAL_ECHO_MSG(
-      MSG_CONFIGURATION_VER
+      STR_CONFIGURATION_VER
       STRING_DISTRIBUTION_DATE
-      MSG_AUTHOR STRING_CONFIG_H_AUTHOR
+      STR_AUTHOR STRING_CONFIG_H_AUTHOR
     );
     SERIAL_ECHO_MSG("Compiled: " __DATE__);
   #endif
 
   SERIAL_ECHO_START();
-  SERIAL_ECHOLNPAIR(MSG_FREE_MEMORY, freeMemory(), MSG_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
+  SERIAL_ECHOLNPAIR(STR_FREE_MEMORY, freeMemory(), STR_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
 
   // UI must be initialized before EEPROM
   // (because EEPROM code calls the UI).
@@ -937,31 +969,27 @@ void setup() {
     ui.show_bootscreen();
   #endif
 
-  #if ENABLED(SDSUPPORT)
-    card.mount(); // Mount the SD card before settings.first_load
-  #endif
+  ui.reset_status();        // Load welcome message early. (Retained if no errors exist.)
 
-  // Load data from EEPROM if available (or use defaults)
-  // This also updates variables in the planner, elsewhere
-  settings.first_load();
+  #if ENABLED(SDSUPPORT)
+    card.mount();           // Mount the SD card before settings.first_load
+  #endif
+                            // Load data from EEPROM if available (or use defaults)
+  settings.first_load();    // This also updates variables in the planner, elsewhere
 
   #if ENABLED(TOUCH_BUTTONS)
     touch.init();
   #endif
 
-  #if HAS_M206_COMMAND
-    // Initialize current position based on home_offset
+  #if HAS_M206_COMMAND      // Initialize current position based on home_offset
     current_position += home_offset;
   #endif
 
-  // Vital to init stepper/planner equivalent for current_position
-  sync_plan_position();
+  sync_plan_position();     // Vital to init stepper/planner equivalent for current_position
 
   thermalManager.init();    // Initialize temperature loop
 
   print_job_timer.init();   // Initial setup of print job timer
-
-  ui.reset_status();        // Print startup message after print statistics are loaded
 
   endstops.init();          // Init endstops and pullups
 
@@ -1110,40 +1138,49 @@ void setup() {
     host_action_prompt_end();
   #endif
 
-  #if HAS_TRINAMIC && DISABLED(PSU_DEFAULT_OFF)
+  #if HAS_TRINAMIC_CONFIG && DISABLED(PSU_DEFAULT_OFF)
     test_tmc_connection(true, true, true, true);
   #endif
 
   #if ENABLED(PRUSA_MMU2)
     mmu2.init();
   #endif
+
+  #if HAS_SERVICE_INTERVALS
+    ui.reset_status(true);  // Show service messages or keep current status
+  #endif
+
+  #if ENABLED(MAX7219_DEBUG)
+    max7219.init();
+  #endif
 }
 
 /**
  * The main Marlin program loop
  *
- *  - Save or log commands to SD
- *  - Process available commands (if not saving)
- *  - Call endstop manager
- *  - Call inactivity manager
+ *  - Call idle() to handle all tasks between G-code commands
+ *      Note that no G-codes from the queue can be executed during idle()
+ *      but many G-codes can be called directly anytime like macros.
+ *  - Check whether SD card auto-start is needed now.
+ *  - Check whether SD print finishing is needed now.
+ *  - Run one G-code command from the immediate or main command queue
+ *    and open up one space. Commands in the main queue may come from sd
+ *    card, host, or by direct injection. The queue will continue to fill
+ *    as long as idle() or manage_inactivity() are being called.
  */
 void loop() {
   do {
-
     idle();
 
     #if ENABLED(SDSUPPORT)
       card.checkautostart();
       if (card.flag.abort_sd_printing) abortSDPrinting();
+      if (card.sdprinting_done_state) finishSDPrinting();
     #endif
 
     queue.advance();
 
     endstops.event_handler();
 
-  } while (false        // Return to caller for best compatibility
-    #ifdef __AVR__
-      || true           // Loop forever on slower (AVR) boards
-    #endif
-  );
+  } while (ENABLED(__AVR__)); // Loop forever on slower (AVR) boards
 }

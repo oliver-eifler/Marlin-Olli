@@ -34,6 +34,37 @@
   #error "Marlin requires C++11 support (gcc >= 4.7, Arduino IDE >= 1.6.8). Please upgrade your toolchain."
 #endif
 
+// Make sure macros aren't borked
+#define TEST1
+#define TEST2 1
+#define TEST3 0
+#define TEST4 true
+#if ENABLED(TEST0)
+  #error "ENABLED is borked!"
+#endif
+#if DISABLED(TEST1)
+  #error "DISABLED is borked!"
+#endif
+#if !ENABLED(TEST2)
+  #error "ENABLED is borked!"
+#endif
+#if ENABLED(TEST3)
+  #error "ENABLED is borked!"
+#endif
+#if DISABLED(TEST4)
+  #error "DISABLED is borked!"
+#endif
+#if !ANY(TEST1, TEST2, TEST3, TEST4) || ANY(TEST0, TEST3)
+  #error "ANY is borked!"
+#endif
+#if DISABLED(TEST0, TEST1, TEST2, TEST4)
+  #error "DISABLED is borked!"
+#endif
+#undef TEST1
+#undef TEST2
+#undef TEST3
+#undef TEST4
+
 /**
  * We try our best to include sanity checks for all changed configuration
  * directives because users have a tendency to use outdated config files with
@@ -1237,7 +1268,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
    * Require some kind of probe for bed leveling and probe testing
    */
   #if HAS_ABL_NOT_UBL && !PROBE_SELECTED
-    #error "Auto Bed Leveling requires one of these: PROBE_MANUALLY, FIX_MOUNTED_PROBE, NOZZLE_AS_PROBE, BLTOUCH, SOLENOID_PROBE, Z_PROBE_ALLEN_KEY, Z_PROBE_SLED, or a Z Servo."
+    #error "Auto Bed Leveling requires one of these: PROBE_MANUALLY, SENSORLESS_PROBING, BLTOUCH, FIX_MOUNTED_PROBE, NOZZLE_AS_PROBE, TOUCH_MI_PROBE, SOLENOID_PROBE, Z_PROBE_ALLEN_KEY, Z_PROBE_SLED, or a Z Servo."
   #endif
 
   #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
@@ -1361,8 +1392,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
  * Make sure Z_SAFE_HOMING point is reachable
  */
 #if ENABLED(Z_SAFE_HOMING)
-  static_assert(WITHIN(Z_SAFE_HOMING_X_POINT, X_MIN_BED, X_MAX_BED), "Z_SAFE_HOMING_X_POINT can't be reached by the nozzle.");
-  static_assert(WITHIN(Z_SAFE_HOMING_Y_POINT, Y_MIN_BED, Y_MAX_BED), "Z_SAFE_HOMING_Y_POINT can't be reached by the nozzle.");
+  static_assert(WITHIN(Z_SAFE_HOMING_X_POINT, X_MIN_POS, X_MAX_POS), "Z_SAFE_HOMING_X_POINT can't be reached by the nozzle.");
+  static_assert(WITHIN(Z_SAFE_HOMING_Y_POINT, Y_MIN_POS, Y_MAX_POS), "Z_SAFE_HOMING_Y_POINT can't be reached by the nozzle.");
 #endif
 
 /**
@@ -2150,6 +2181,47 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #endif
 #undef INVALID_TMC_ADDRESS
 
+#define _TMC_MICROSTEP_IS_VALID(MS) (MS == 0 || MS == 2 || MS == 4 || MS == 8 || MS == 16 || MS == 32 || MS == 64 || MS == 128 || MS == 256)
+#define TMC_MICROSTEP_IS_VALID(M) (!AXIS_IS_TMC(M) || _TMC_MICROSTEP_IS_VALID(M##_MICROSTEPS))
+#define INVALID_TMC_MS(ST) static_assert(0, "Invalid " STRINGIFY(ST) "_MICROSTEPS. Valid values are 0, 2, 4, 8, 16, 32, 64, 128, and 256.")
+
+#if !TMC_MICROSTEP_IS_VALID(X)
+  INVALID_TMC_MS(X);
+#elif !TMC_MICROSTEP_IS_VALID(Y)
+  INVALID_TMC_MS(Y)
+#elif !TMC_MICROSTEP_IS_VALID(Z)
+  INVALID_TMC_MS(Z)
+#elif !TMC_MICROSTEP_IS_VALID(X2)
+  INVALID_TMC_MS(X2);
+#elif !TMC_MICROSTEP_IS_VALID(Y2)
+  INVALID_TMC_MS(Y2)
+#elif !TMC_MICROSTEP_IS_VALID(Z2)
+  INVALID_TMC_MS(Z2)
+#elif !TMC_MICROSTEP_IS_VALID(Z3)
+  INVALID_TMC_MS(Z3)
+#elif !TMC_MICROSTEP_IS_VALID(Z4)
+  INVALID_TMC_MS(Z4)
+#elif !TMC_MICROSTEP_IS_VALID(E0)
+  INVALID_TMC_MS(E0)
+#elif !TMC_MICROSTEP_IS_VALID(E1)
+  INVALID_TMC_MS(E1)
+#elif !TMC_MICROSTEP_IS_VALID(E2)
+  INVALID_TMC_MS(E2)
+#elif !TMC_MICROSTEP_IS_VALID(E3)
+  INVALID_TMC_MS(E3)
+#elif !TMC_MICROSTEP_IS_VALID(E4)
+  INVALID_TMC_MS(E4)
+#elif !TMC_MICROSTEP_IS_VALID(E5)
+  INVALID_TMC_MS(E5)
+#elif !TMC_MICROSTEP_IS_VALID(E6)
+  INVALID_TMC_MS(E6)
+#elif !TMC_MICROSTEP_IS_VALID(E7)
+  INVALID_TMC_MS(E7)
+#endif
+#undef INVALID_TMC_MS
+#undef TMC_MICROSTEP_IS_VALID
+#undef _TMC_MICROSTEP_IS_VALID
+
 #if ENABLED(DELTA) && (ENABLED(STEALTHCHOP_XY) != ENABLED(STEALTHCHOP_Z))
   #error "STEALTHCHOP_XY and STEALTHCHOP_Z must be the same on DELTA."
 #endif
@@ -2731,4 +2803,9 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
  */
 #if HAS_TMC_SPI && ALL(MONITOR_DRIVER_STATUS, SDSUPPORT, USES_SHARED_SPI)
   #error "MONITOR_DRIVER_STATUS and SDSUPPORT cannot be used together on boards with shared SPI."
+#endif
+
+// G60/G61 Position Save
+#if SAVED_POSITIONS > 256
+  #error "SAVED_POSITIONS must be an integer from 0 to 256."
 #endif
