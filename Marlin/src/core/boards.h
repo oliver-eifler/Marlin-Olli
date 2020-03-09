@@ -352,6 +352,11 @@
 
 #define BOARD_LINUX_RAMPS             9999
 
+//
+// Olli: modified boards
+//
+#define BOARD_OLLI_SKR_PRO_V1_1        14208  // BigTreeTech SKR Pro v1.1 (STM32F407ZG)
+
 #define _MB_1(B)  (defined(BOARD_##B) && MOTHERBOARD==BOARD_##B)
 #define MB(V...)  DO(MB,||,V)
 

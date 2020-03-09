@@ -527,7 +527,21 @@
     #endif
   #endif
 #endif
-
+// z2 cs_pin undefined fix
+/*
+#undef E1_STEP_PIN        
+#undef E1_DIR_PIN         
+#undef E1_ENABLE_PIN      
+#ifdef E1_CS_PIN
+  #undef E1_CS_PIN        
+#endif
+#define Z2_STEP_PIN        PD15
+#define Z2_DIR_PIN         PE7
+#define Z2_ENABLE_PIN      PA3
+#ifndef Z2_CS_PIN
+  #define Z2_CS_PIN        PG15
+#endif
+*/
 /**
  * Dual X Carriage
  *

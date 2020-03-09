@@ -596,6 +596,15 @@
 #elif MB(LINUX_RAMPS)
   #include "linux/pins_RAMPS_LINUX.h"           // Linux                                  env:linux_native
 
+//
+// Olli: modified boards
+//
+
+#elif MB(OLLI_SKR_PRO_V1_1)
+  #include "olli/pins_OLLI_SKR_PRO_V1_1.h"      // STM32F4                                env:BIGTREE_SKR_PRO
+
+
+
 #else
 
   //
