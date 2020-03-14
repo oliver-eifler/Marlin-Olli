@@ -99,7 +99,9 @@
 #elif defined(X_HOME_RETRACT_MM)
   #error "[XYZ]_HOME_RETRACT_MM settings have been renamed [XYZ]_HOME_BUMP_MM."
 #elif defined(SDCARDDETECTINVERTED)
-  #error "SDCARDDETECTINVERTED is now SD_DETECT_INVERTED. Please update your configuration."
+  #error "SDCARDDETECTINVERTED is now SD_DETECT_STATE (HIGH). Please update your configuration."
+#elif defined(SD_DETECT_INVERTED)
+  #error "SD_DETECT_INVERTED is now SD_DETECT_STATE (HIGH). Please update your configuration."
 #elif defined(BTENABLED)
   #error "BTENABLED is now BLUETOOTH. Please update your configuration."
 #elif defined(CUSTOM_MENDEL_NAME)
@@ -481,6 +483,8 @@
   #error "Z_TRIPLE_ENDSTOPS is now Z_MULTI_ENDSTOPS. Please update Configuration_adv.h."
 #elif defined(Z_QUAD_ENDSTOPS)
   #error "Z_QUAD_ENDSTOPS is now Z_MULTI_ENDSTOPS. Please update Configuration_adv.h."
+#elif defined(DUGS_UI_MOVE_DIS_OPTION)
+  #error "DUGS_UI_MOVE_DIS_OPTION is spelled DGUS_UI_MOVE_DIS_OPTION. Please update Configuration_adv.h."
 #endif
 
 /**
@@ -2505,8 +2509,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
     #error "Z_STEPPER_AUTO_ALIGN requires NUM_Z_STEPPER_DRIVERS greater than 1."
   #elif !HAS_BED_PROBE
     #error "Z_STEPPER_AUTO_ALIGN requires a Z-bed probe."
-  #elif ENABLED(Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS) && NUM_Z_STEPPER_DRIVERS != 3
-    #error "Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS requires NUM_Z_STEPPER_DRIVERS to be 3."
+  #elif ENABLED(Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS) && NUM_Z_STEPPER_DRIVERS < 3
+    #error "Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS requires NUM_Z_STEPPER_DRIVERS to be 3 or 4."
   #endif
 #endif
 
