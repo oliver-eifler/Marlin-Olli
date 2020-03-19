@@ -24,10 +24,10 @@
 #ifndef TARGET_STM32F4
   #error "Oops! Select an STM32F4 board in 'Tools > Board.'"
 #elif HOTENDS > 3 || E_STEPPERS > 3
-  #error "BIGTREE SKR Pro V1.1 supports up to 3 hotends / E-steppers."
+  #error "OLLI BTT SKR Pro V1.1 supports up to 3 hotends / E-steppers."
 #endif
 
-#define BOARD_INFO_NAME "BIGTREE SKR Pro 1.1" // redefined?
+#define BOARD_INFO_NAME "OLLI BTT SKR Pro 1.1" // redefined?
 
 // Use one of these or SDCard-based Emulation will be used
 //#define SRAM_EEPROM_EMULATION   // Use BackSRAM-based EEPROM emulation
@@ -142,7 +142,7 @@
   #endif
 #endif
 
-#if HAS_TMC220x
+#if HAS_TMC_UART
   /**
    * TMC2208/TMC2209 stepper drivers
    *
