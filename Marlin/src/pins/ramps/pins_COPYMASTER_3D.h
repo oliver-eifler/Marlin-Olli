@@ -21,30 +21,13 @@
  */
 #pragma once
 
-/**
- * Azteeg X5 MINI pin assignments
- */
+#define BOARD_INFO_NAME "Copymaster 3D RAMPS"
 
-#ifndef MCU_LPC1769
-  #error "Oops! Make sure you have the LPC1769 environment selected in your IDE."
-#endif
-
-#define BOARD_INFO_NAME "Azteeg X5 MINI WIFI"
+#define Z_STEP_PIN        47
+#define FIL_RUNOUT_PIN    15
+#define SD_DETECT_PIN     66
 
 //
-// EEPROM
+// Import RAMPS 1.4 pins
 //
-#define FLASH_EEPROM_EMULATION
-//#define SDCARD_EEPROM_EMULATION
-
-//
-// DIGIPOT slave addresses
-//
-#ifndef DIGIPOT_I2C_ADDRESS_A
-  #define DIGIPOT_I2C_ADDRESS_A 0x58   // shifted slave address for first DIGIPOT (0x58 <- 0x2C << 1)
-#endif
-#ifndef DIGIPOT_I2C_ADDRESS_B
-  #define DIGIPOT_I2C_ADDRESS_B 0x5C   // shifted slave address for second DIGIPOT (0x5C <- 0x2E << 1)
-#endif
-
-#include "pins_AZTEEG_X5_MINI.h"
+#include "pins_RAMPS.h"
