@@ -778,7 +778,7 @@
 // Increase the slowdown divisor for larger buffer sizes.
 #define SLOWDOWN
 #if ENABLED(SLOWDOWN)
-  #define SLOWDOWN_DIVISOR 2
+  #define SLOWDOWN_DIVISOR 16
 #endif
 
 // Frequency limit
@@ -1732,7 +1732,7 @@
 #if ENABLED(SDSUPPORT)
   #define BLOCK_BUFFER_SIZE 16 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
-  #define BLOCK_BUFFER_SIZE 32 // maximize block buffer
+  #define BLOCK_BUFFER_SIZE 64 // maximize block buffer
 #endif
 
 // @section serial

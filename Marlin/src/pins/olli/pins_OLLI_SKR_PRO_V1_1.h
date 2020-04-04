@@ -227,7 +227,6 @@
   #define SDSS                              PB12
 #endif
 
-
 /**
  *               _____                                             _____
  *           NC | · · | GND                                    5V | · · | GND
@@ -260,7 +259,6 @@
     #undef ST7920_DELAY_1
     #undef ST7920_DELAY_2
     #undef ST7920_DELAY_3
-
 
   #else
 
