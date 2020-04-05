@@ -90,6 +90,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_PREHEAT_2_SETTINGS              = _UxGT("Preheat ") PREHEAT_2_LABEL _UxGT(" Conf");
   PROGMEM Language_Str MSG_PREHEAT_CUSTOM                  = _UxGT("Preheat Custom");
   PROGMEM Language_Str MSG_COOLDOWN                        = _UxGT("Cooldown");
+  PROGMEM Language_Str MSG_CUTTER_FREQUENCY                = _UxGT("Frequency");
   PROGMEM Language_Str MSG_LASER_MENU                      = _UxGT("Laser Control");
   PROGMEM Language_Str MSG_LASER_OFF                       = _UxGT("Laser Off");
   PROGMEM Language_Str MSG_LASER_ON                        = _UxGT("Laser On");
@@ -240,6 +241,8 @@ namespace Language_en {
   PROGMEM Language_Str MSG_BED_Z                           = _UxGT("Bed Z");
   PROGMEM Language_Str MSG_NOZZLE                          = _UxGT("Nozzle");
   PROGMEM Language_Str MSG_NOZZLE_N                        = _UxGT("Nozzle ~");
+  PROGMEM Language_Str MSG_NOZZLE_PARKED                   = _UxGT("Nozzle Parked");
+  PROGMEM Language_Str MSG_NOZZLE_STANDBY                  = _UxGT("Nozzle Standby");
   PROGMEM Language_Str MSG_BED                             = _UxGT("Bed");
   PROGMEM Language_Str MSG_CHAMBER                         = _UxGT("Enclosure");
   PROGMEM Language_Str MSG_FAN_SPEED                       = _UxGT("Fan Speed");
@@ -247,6 +250,11 @@ namespace Language_en {
   PROGMEM Language_Str MSG_STORED_FAN_N                    = _UxGT("Stored Fan ~");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED                 = _UxGT("Extra Fan Speed");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("Extra Fan Speed ~");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN                  = _UxGT("Controller Fan");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_IDLE_SPEED       = _UxGT("Idle Speed");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_AUTO_ON          = _UxGT("Auto Mode");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_SPEED            = _UxGT("Active Speed");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_DURATION         = _UxGT("Idle Period");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("Flow");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("Flow ~");
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("Control");
@@ -312,8 +320,11 @@ namespace Language_en {
   PROGMEM Language_Str MSG_CONTRAST                        = _UxGT("LCD Contrast");
   PROGMEM Language_Str MSG_STORE_EEPROM                    = _UxGT("Store Settings");
   PROGMEM Language_Str MSG_LOAD_EEPROM                     = _UxGT("Load Settings");
-  PROGMEM Language_Str MSG_RESTORE_FAILSAFE                = _UxGT("Restore failsafe");
+  PROGMEM Language_Str MSG_RESTORE_DEFAULTS                = _UxGT("Restore Defaults");
   PROGMEM Language_Str MSG_INIT_EEPROM                     = _UxGT("Initialize EEPROM");
+  PROGMEM Language_Str MSG_ERR_EEPROM_CRC                  = _UxGT("Err: EEPROM CRC");
+  PROGMEM Language_Str MSG_ERR_EEPROM_INDEX                = _UxGT("Err: EEPROM Index");
+  PROGMEM Language_Str MSG_ERR_EEPROM_VERSION              = _UxGT("Err: EEPROM Version");
   PROGMEM Language_Str MSG_MEDIA_UPDATE                    = _UxGT("Media Update");
   PROGMEM Language_Str MSG_RESET_PRINTER                   = _UxGT("Reset Printer");
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("Refresh");
@@ -344,6 +355,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_PRINT_PAUSED                    = _UxGT("Print Paused");
   PROGMEM Language_Str MSG_PRINTING                        = _UxGT("Printing...");
   PROGMEM Language_Str MSG_PRINT_ABORTED                   = _UxGT("Print Aborted");
+  PROGMEM Language_Str MSG_PRINT_DONE                      = _UxGT("Print Done");
   PROGMEM Language_Str MSG_NO_MOVE                         = _UxGT("No Move.");
   PROGMEM Language_Str MSG_KILLED                          = _UxGT("KILLED. ");
   PROGMEM Language_Str MSG_STOPPED                         = _UxGT("STOPPED. ");
@@ -362,7 +374,6 @@ namespace Language_en {
   PROGMEM Language_Str MSG_TOOL_CHANGE_ZLIFT               = _UxGT("Z Raise");
   PROGMEM Language_Str MSG_SINGLENOZZLE_PRIME_SPD          = _UxGT("Prime Speed");
   PROGMEM Language_Str MSG_SINGLENOZZLE_RETRACT_SPD        = _UxGT("Retract Speed");
-  PROGMEM Language_Str MSG_NOZZLE_STANDBY                  = _UxGT("Nozzle Standby");
   PROGMEM Language_Str MSG_FILAMENTCHANGE                  = _UxGT("Change Filament");
   PROGMEM Language_Str MSG_FILAMENTCHANGE_E                = _UxGT("Change Filament *");
   PROGMEM Language_Str MSG_FILAMENTLOAD                    = _UxGT("Load Filament");
@@ -593,6 +604,12 @@ namespace Language_en {
   PROGMEM Language_Str MSG_BACKLASH_C                      = LCD_STR_C;
   PROGMEM Language_Str MSG_BACKLASH_CORRECTION             = _UxGT("Correction");
   PROGMEM Language_Str MSG_BACKLASH_SMOOTHING              = _UxGT("Smoothing");
+
+  PROGMEM Language_Str MSG_LEVEL_X_AXIS                    = _UxGT("Level X Axis");
+  PROGMEM Language_Str MSG_AUTO_CALIBRATE                  = _UxGT("Auto Calibrate");
+  PROGMEM Language_Str MSG_HEATER_TIMEOUT                  = _UxGT("Heater Timeout");
+  PROGMEM Language_Str MSG_REHEAT                          = _UxGT("Reheat");
+  PROGMEM Language_Str MSG_REHEATING                       = _UxGT("Reheating...");
 }
 
 #if FAN_COUNT == 1
