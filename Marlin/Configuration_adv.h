@@ -1715,7 +1715,7 @@
   #ifdef SLOWDOWN_DIVISOR
     #undef SLOWDOWN_DIVISOR
   #endif
-  #define SLOWDOWN_DIVISOR BLOCK_BUFFER_SIZE/8
+  #define SLOWDOWN_DIVISOR (BLOCK_BUFFER_SIZE/8)
 #endif
 
 // @section serial
