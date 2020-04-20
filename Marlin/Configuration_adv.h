@@ -1711,13 +1711,14 @@
 #endif
 
 //OLLI: Little block_buffer magic ;)
+/*
 #if ENABLED(SLOWDOWN)
   #ifdef SLOWDOWN_DIVISOR
     #undef SLOWDOWN_DIVISOR
   #endif
   #define SLOWDOWN_DIVISOR (BLOCK_BUFFER_SIZE/8)
 #endif
-
+*/
 // @section serial
 
 // The ASCII buffer for serial input
