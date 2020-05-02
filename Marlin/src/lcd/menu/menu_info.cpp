@@ -241,6 +241,10 @@ void menu_info_board() {
     STATIC_ITEM_P(PSTR(SHORT_BUILD_VERSION));                   // x.x.x-Branch
     STATIC_ITEM_P(PSTR(STRING_DISTRIBUTION_DATE));              // YYYY-MM-DD HH:MM
     STATIC_ITEM_P(PSTR(MACHINE_NAME));                          // My3DPrinter
+    //Olli: Show compile time
+    #if ENABLED(LCD_INFO_COMPILETIME)
+      STATIC_ITEM_P(PSTR(__DATE__ " " __TIME__));              // mmm DD YYYY HH:MM:SS
+    #endif
     STATIC_ITEM_P(PSTR(WEBSITE_URL));                           // www.my3dprinter.com
     VALUE_ITEM_P(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
     #if HAS_BED_LEVELING

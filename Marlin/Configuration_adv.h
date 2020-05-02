@@ -795,7 +795,7 @@
 // Increase the slowdown divisor for larger buffer sizes.
 #define SLOWDOWN
 #if ENABLED(SLOWDOWN)
-  #define SLOWDOWN_DIVISOR 16
+  #define SLOWDOWN_DIVISOR 2
 #endif
 
 /**
@@ -906,7 +906,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1006,9 +1006,11 @@
 #if HAS_LCD_MENU
 
   // Include a page of printer information in the LCD Main Menu
-  //#define LCD_INFO_MENU
+  #define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
     //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
+    #define LCD_INFO_COMPILETIME // Show compile time after printer name  
+  
   #endif
 
   // BACK menu items keep the highlight at the top
@@ -1247,7 +1249,7 @@
    *
    * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
    */
-  //#define SDCARD_CONNECTION LCD
+  #define SDCARD_CONNECTION ONBOARD
 
 #endif // SDSUPPORT
 
@@ -1754,11 +1756,17 @@
 // The number of linear motions that can be in the plan at any give time.
 // THE BLOCK_BUFFER_SIZE NEEDS TO BE A POWER OF 2 (e.g. 8, 16, 32) because shifts and ors are used to do the ring-buffering.
 #if ENABLED(SDSUPPORT)
-  #define BLOCK_BUFFER_SIZE 16 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
+  #define BLOCK_BUFFER_SIZE 64 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
   #define BLOCK_BUFFER_SIZE 64 // maximize block buffer
 #endif
-
+//OLLI: Little block_buffer magic ;)
+#if ENABLED(SLOWDOWN) && (ENABLED(BLOCK_BUFFER_SIZE) && BLOCK_BUFFER_SIZE > 16)
+  #ifdef SLOWDOWN_DIVISOR
+    #undef SLOWDOWN_DIVISOR
+  #endif
+  #define SLOWDOWN_DIVISOR (BLOCK_BUFFER_SIZE/8)
+#endif
 // @section serial
 
 // The ASCII buffer for serial input
@@ -1812,7 +1820,7 @@
 //#define NO_TIMEOUTS 1000 // Milliseconds
 
 // Some clients will have this feature soon. This could make the NO_TIMEOUTS unnecessary.
-//#define ADVANCED_OK
+#define ADVANCED_OK
 
 // Printrun may have trouble receiving long strings all at once.
 // This option inserts short delays between lines of serial output.
@@ -3360,6 +3368,7 @@
 //#define E2END 0x7FFF
 
 //fix STM4xx timers
-#define STEP_TIMER 6
-#define TEMP_TIMER 14
+
+//#define STEP_TIMER 6
+//#define TEMP_TIMER 14
 
