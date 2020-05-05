@@ -413,7 +413,7 @@
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  */
-#define TEMP_SENSOR_0 998 //11
+#define TEMP_SENSOR_0 11
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -421,7 +421,7 @@
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 999 //1
+#define TEMP_SENSOR_BED 1
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
 
@@ -478,7 +478,7 @@
 #define PID_MAX BANG_MAX // Limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #define PID_K1 0.95      // Smoothing factor within any PID loop
 #if ENABLED(PIDTEMP)
-  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
+  #define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
   #define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
   //#define PID_DEBUG             // Sends debug data to the serial port. Use 'M303 D' to toggle activation.
   //#define PID_OPENLOOP 1        // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
@@ -506,9 +506,9 @@
   //#define DEFAULT_Kd 440
 
   // Olli MK1 - Turnberger3D/3DFreunde V6-Clone
-  #define DEFAULT_Kp 17.02
-  #define DEFAULT_Ki 1.16
-  #define DEFAULT_Kd 62.40
+  #define DEFAULT_Kp 25.04
+  #define DEFAULT_Ki 1.99
+  #define DEFAULT_Kd 78.61
 #endif // PIDTEMP
 
 //===========================================================================
@@ -557,9 +557,9 @@
   //#define DEFAULT_bedKd 1675.16
 
   //Olli MK1 Ultrabase 12V
-  #define DEFAULT_bedKp 318.18
-  #define DEFAULT_bedKi 60.69
-  #define DEFAULT_bedKd 417.01
+  #define DEFAULT_bedKp 121.85
+  #define DEFAULT_bedKi 23.08
+  #define DEFAULT_bedKd 428.93
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
 
@@ -754,7 +754,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 10, 100 }
+#define DEFAULT_MAX_FEEDRATE          { 200, 200, 25, 100 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -984,11 +984,11 @@
 //old olli-style
 #define X_PROBE_OFFSET -31
 #define Y_PROBE_OFFSET 10
-#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, -2.64 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define MIN_PROBE_EDGE 10
+#define MIN_PROBE_EDGE 20
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (50*60)
@@ -1085,13 +1085,13 @@
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR false
-#define INVERT_Y_DIR false
-#define INVERT_Z_DIR true
+#define INVERT_Y_DIR true
+#define INVERT_Z_DIR false
 
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#define INVERT_E0_DIR true
+#define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -1124,12 +1124,12 @@
 #define Y_BED_SIZE 220
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
-#define Y_MIN_POS 0
+#define X_MIN_POS -6
+#define Y_MIN_POS -67
 #define Z_MIN_POS 0
-#define X_MAX_POS (X_MIN_POS+300)
-#define Y_MAX_POS (Y_MIN_POS+300)
-#define Z_MAX_POS 220
+#define X_MAX_POS 260
+#define Y_MAX_POS 300
+#define Z_MAX_POS 250
 
 /**
  * Software Endstops
