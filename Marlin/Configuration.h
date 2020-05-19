@@ -508,9 +508,9 @@
   //#define DEFAULT_Kd 440
 
   // Olli MK1 - Turnberger3D/3DFreunde V6-Clone
-  #define DEFAULT_Kp 25.04
-  #define DEFAULT_Ki 1.99
-  #define DEFAULT_Kd 78.61
+  #define DEFAULT_Kp 21.16
+  #define DEFAULT_Ki 1.54
+  #define DEFAULT_Kd 72.77
 #endif // PIDTEMP
 
 //===========================================================================
@@ -986,7 +986,7 @@
 //old olli-style
 #define X_PROBE_OFFSET -31
 #define Y_PROBE_OFFSET 10
-#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, -2.64 }
+#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, -4.10 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1054,7 +1054,7 @@
  * These options are most useful for the BLTouch probe, but may also improve
  * readings with inductive probes and piezo sensors.
  */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+#define PROBING_HEATERS_OFF       // Turn heaters off when probing
 #if ENABLED(PROBING_HEATERS_OFF)
   //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
 #endif
