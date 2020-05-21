@@ -29,23 +29,24 @@
 
 #define BOARD_INFO_NAME "OLLI BTT SKR Pro 1.1" // redefined?
 
-#define I2C_EEPROM
-#ifdef I2C_EEPROM
-  #ifdef E2END
-    #undef E2END
-  #endif
-  #define E2END 0x7FFF
-#endif
 // Use one of these or SDCard-based Emulation will be used
 #if NO_EEPROM_SELECTED
   //#define SRAM_EEPROM_EMULATION                 // Use BackSRAM-based EEPROM emulation
-  #define FLASH_EEPROM_EMULATION                  // Use Flash-based EEPROM emulation
+  //#define FLASH_EEPROM_EMULATION                // Use Flash-based EEPROM emulation
+  #define I2C_EEPROM                              // Use excternal I2C EEPROM
 #endif
 
 #if ENABLED(FLASH_EEPROM_EMULATION)
   // Decrease delays and flash wear by spreading writes across the
   // 128 kB sector allocated for EEPROM emulation.
   #define FLASH_EEPROM_LEVELING
+#endif
+//olli external eeprom
+#ifdef I2C_EEPROM
+  #ifdef E2END
+    #undef E2END
+  #endif
+  #define E2END 0x7FFF
 #endif
 
 //
