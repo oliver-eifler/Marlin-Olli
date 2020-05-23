@@ -1773,7 +1773,7 @@
 // @section temperature
 
 // Control heater 0 and heater 1 in parallel.
-#define HEATERS_PARALLEL
+//#define HEATERS_PARALLEL
 
 //===========================================================================
 //================================= Buffers =================================
