@@ -29,6 +29,7 @@
 
 #define BOARD_INFO_NAME "OLLI BTT SKR Pro 1.1" // redefined?
 
+
 // Use one of these or SDCard-based Emulation will be used
 #if NO_EEPROM_SELECTED
   //#define SRAM_EEPROM_EMULATION                 // Use BackSRAM-based EEPROM emulation
@@ -40,13 +41,6 @@
   // Decrease delays and flash wear by spreading writes across the
   // 128 kB sector allocated for EEPROM emulation.
   #define FLASH_EEPROM_LEVELING
-#endif
-//olli external eeprom
-#ifdef I2C_EEPROM
-  #ifdef E2END
-    #undef E2END
-  #endif
-  #define E2END 0x7FFF
 #endif
 
 //
@@ -217,10 +211,15 @@
 //
 // Temperature Sensors
 //
+/*
 #define TEMP_0_PIN                          PF4   // T1 <-> E0
 #define TEMP_1_PIN                          PF5   // T2 <-> E1
 #define TEMP_2_PIN                          PF6   // T3 <-> E2
+*/
 #define TEMP_BED_PIN                        PF3   // T0 <-> Bed
+#define TEMP_2_PIN                          PF4   // T1 <-> E0
+#define TEMP_1_PIN                          PF5   // T2 <-> E1
+#define TEMP_0_PIN                          PF6   // T3 <-> E2
 
 //
 // Heaters / Fans

@@ -3431,3 +3431,5 @@
 //#define STEP_TIMER 6
 //#define TEMP_TIMER 14
 
+#define I2C_EEPROM
+#define MARLIN_EEPROM_SIZE (32*1024)                // 32KB
