@@ -504,9 +504,9 @@
   //#define DEFAULT_Kd 440
 
   // Olli MK1 - Turnberger3D/3DFreunde V6-Clone
-  #define DEFAULT_Kp 40.74
-  #define DEFAULT_Ki 5.85
-  #define DEFAULT_Kd 70.89
+  #define DEFAULT_Kp 29.66
+  #define DEFAULT_Ki 3.17
+  #define DEFAULT_Kd 69.40
 #endif // PIDTEMP
 
 //===========================================================================
