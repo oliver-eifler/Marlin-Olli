@@ -990,7 +990,7 @@
 //old olli-style
 #define X_PROBE_OFFSET -31
 #define Y_PROBE_OFFSET 10
-#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, -4.10 }
+#define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, -4.20 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
