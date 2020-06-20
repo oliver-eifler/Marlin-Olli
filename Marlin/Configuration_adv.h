@@ -1029,8 +1029,12 @@
   #define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
     //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
-    #define LCD_INFO_COMPILETIME // Show compile time after printer name  
-  
+    #define LCD_INFO_BUILDTIME // //Olli: Show build time
+    #if ENABLED(LCD_INFO_BUILDTIME)
+      #ifndef MARLIN_BUILD_TIMESTAMP
+        #define MARLIN_BUILD_TIMESTAMP (__DATE__ " " __TIME__)  
+      #endif
+    #endif
   #endif
 
   // BACK menu items keep the highlight at the top
