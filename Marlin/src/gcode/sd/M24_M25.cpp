@@ -31,7 +31,6 @@
 
 #if ENABLED(PARK_HEAD_ON_PAUSE)
   #include "../../feature/pause.h"
-  #include "../queue.h"
 #endif
 
 #if ENABLED(HOST_ACTION_COMMANDS)
@@ -82,23 +81,24 @@ void GcodeSuite::M24() {
  */
 void GcodeSuite::M25() {
 
-  // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
-  #if ENABLED(SDSUPPORT)
-    if (IS_SD_PRINTING()) card.pauseSDPrint();
-  #endif
-
   #if ENABLED(PARK_HEAD_ON_PAUSE)
 
     M125();
 
   #else
 
+    // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
+    #if ENABLED(SDSUPPORT)
+      if (IS_SD_PRINTING()) card.pauseSDPrint();
+    #endif
+
     #if ENABLED(POWER_LOSS_RECOVERY)
       if (recovery.enabled) recovery.save(true);
     #endif
 
     print_job_timer.pause();
-    ui.reset_status();
+
+    TERN(DWIN_CREALITY_LCD,,ui.reset_status());
 
     #if ENABLED(HOST_ACTION_COMMANDS)
       TERN_(HOST_PROMPT_SUPPORT, host_prompt_open(PROMPT_PAUSE_RESUME, PSTR("Pause SD"), PSTR("Resume")));

@@ -47,11 +47,12 @@
   bool toolchange_extruder_ready[EXTRUDERS];
 #endif
 
-#if ENABLED(SINGLENOZZLE)
+#if ENABLED(SINGLENOZZLE_STANDBY_TEMP)
   uint16_t singlenozzle_temp[EXTRUDERS];
-  #if FAN_COUNT > 0
-    uint8_t singlenozzle_fan_speed[EXTRUDERS];
-  #endif
+#endif
+
+#if BOTH(HAS_FAN, SINGLENOZZLE_STANDBY_FAN)
+  uint8_t singlenozzle_fan_speed[EXTRUDERS];
 #endif
 
 #if ENABLED(MAGNETIC_PARKING_EXTRUDER) || defined(EVENT_GCODE_AFTER_TOOLCHANGE) || (ENABLED(PARKING_EXTRUDER) && PARKING_EXTRUDER_SOLENOIDS_DELAY > 0)
@@ -789,6 +790,11 @@ void tool_change_prime() {
 
     const bool ok = TERN1(TOOLCHANGE_PARK, all_axes_homed() && toolchange_settings.enable_park);
 
+    #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
+      // Store and stop fan. Restored on any exit.
+      REMEMBER(fan, thermalManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
+    #endif
+
     // Z raise
     if (ok) {
       // Do a small lift to avoid the workpiece in the move back (below)
@@ -819,11 +825,10 @@ void tool_change_prime() {
     #endif
 
     // Cool down with fan
-    #if TOOLCHANGE_FS_FAN >= 0 && FAN_COUNT > 0
-      const int16_t fansp = thermalManager.fan_speed[TOOLCHANGE_FS_FAN];
+    #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
       thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
-      safe_delay(toolchange_settings.fan_time * 1000);
-      thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = fansp;
+      gcode.dwell(toolchange_settings.fan_time * 1000);
+      thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
     #endif
 
     // Move back
@@ -914,7 +919,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
     const uint8_t old_tool = active_extruder;
     const bool can_move_away = !no_move && !idex_full_control;
 
-    #if HAS_LEVELING && DISABLED(SINGLENOZZLE)
+    #if HAS_LEVELING
       // Set current position to the physical position
       TEMPORARY_BED_LEVELING_STATE(false);
     #endif
@@ -932,9 +937,14 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
     if (new_tool != old_tool) {
       destination = current_position;
 
+      #if BOTH(TOOLCHANGE_FILAMENT_SWAP, HAS_FAN) && TOOLCHANGE_FS_FAN >= 0
+        // Store and stop fan. Restored on any exit.
+        REMEMBER(fan, thermalManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
+      #endif
+
       // Z raise before retraction
       #if ENABLED(TOOLCHANGE_ZRAISE_BEFORE_RETRACT) && DISABLED(SWITCHING_NOZZLE)
-        if (can_move_away && TERN1(toolchange_settings.enable_park)) {
+        if (can_move_away && TERN1(TOOLCHANGE_PARK, toolchange_settings.enable_park)) {
           // Do a small lift to avoid the workpiece in the move back (below)
           current_position.z += toolchange_settings.z_raise;
           #if HAS_SOFTWARE_ENDSTOPS
@@ -956,8 +966,14 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
             SERIAL_ECHO_MSG(STR_ERR_HOTEND_TOO_COLD);
             if (ENABLED(SINGLENOZZLE)) { active_extruder = new_tool; return; }
           }
-          else
-            unscaled_e_move(-toolchange_settings.swap_length, MMM_TO_MMS(toolchange_settings.retract_speed));
+          else {
+            #if ENABLED(TOOLCHANGE_FS_PRIME_FIRST_USED)
+              // For first new tool, change without unloading the old. 'Just prime/init the new'
+              if (first_tool_is_primed)
+                unscaled_e_move(-toolchange_settings.swap_length, MMM_TO_MMS(toolchange_settings.retract_speed));
+              first_tool_is_primed = true; // The first new tool will be primed by toolchanging
+            #endif
+          }
         }
       #endif
 
@@ -1059,15 +1075,16 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
       const bool should_move = safe_to_move && !no_move && IsRunning();
       if (should_move) {
 
-        #if ENABLED(SINGLENOZZLE)
-          #if FAN_COUNT > 0
-            singlenozzle_fan_speed[old_tool] = thermalManager.fan_speed[0];
-            thermalManager.fan_speed[0] = singlenozzle_fan_speed[new_tool];
-          #endif
+        #if BOTH(HAS_FAN, SINGLENOZZLE_STANDBY_FAN)
+          singlenozzle_fan_speed[old_tool] = thermalManager.fan_speed[0];
+          thermalManager.fan_speed[0] = singlenozzle_fan_speed[new_tool];
+        #endif
 
+        #if ENABLED(SINGLENOZZLE_STANDBY_TEMP)
           singlenozzle_temp[old_tool] = thermalManager.temp_hotend[0].target;
           if (singlenozzle_temp[new_tool] && singlenozzle_temp[new_tool] != singlenozzle_temp[old_tool]) {
             thermalManager.setTargetHotend(singlenozzle_temp[new_tool], 0);
+            TERN_(AUTOTEMP, planner.autotemp_update());
             TERN_(HAS_DISPLAY, thermalManager.set_heating_message(0));
             (void)thermalManager.wait_for_hotend(0, false);  // Wait for heating or cooling
           }
@@ -1098,11 +1115,10 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
             #endif
 
             // Cool down with fan
-            #if TOOLCHANGE_FS_FAN >= 0 && FAN_COUNT > 0
-              const int16_t fansp = thermalManager.fan_speed[TOOLCHANGE_FS_FAN];
+            #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
               thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
-              safe_delay(toolchange_settings.fan_time * 1000);
-              thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = fansp;
+              gcode.dwell(toolchange_settings.fan_time * 1000);
+              thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
             #endif
           }
         #endif
@@ -1151,6 +1167,11 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
             unscaled_e_move(toolchange_settings.extra_resume + TOOLCHANGE_FS_WIPE_RETRACT, MMM_TO_MMS(toolchange_settings.unretract_speed));
             current_position.e = 0;
             sync_plan_position_e(); // New extruder primed and set to 0
+
+            // Restart Fan
+            #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
+              RESTORE(fan);
+            #endif
           }
         #endif
 
@@ -1201,16 +1222,27 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
 #if ENABLED(TOOLCHANGE_MIGRATION_FEATURE)
 
-  void extruder_migration() {
+  bool extruder_migration() {
 
     #if ENABLED(PREVENT_COLD_EXTRUSION)
-      if (thermalManager.targetTooColdToExtrude(active_extruder)) return;
+      if (thermalManager.targetTooColdToExtrude(active_extruder)) {
+        #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+          SERIAL_ECHOLN("Migration Source Too Cold");
+        #endif
+        return false;
+      }
     #endif
 
     // No auto-migration or specified target?
     if (!migration.target && active_extruder >= migration.last) {
+      #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+        SERIAL_ECHO_MSG("No Migration Target");
+        SERIAL_ECHO_MSG("Target: ", migration.target,
+                        " Last: ", migration.last,
+                        " Active: ", active_extruder);
+      #endif
       migration.automode = false;
-      return;
+      return false;
     }
 
     // Migrate to a target or the next extruder
@@ -1218,6 +1250,9 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
     uint8_t migration_extruder = active_extruder;
 
     if (migration.target) {
+      #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+        SERIAL_ECHOLN("Migration using fixed target");
+      #endif
       // Specified target ok?
       const int16_t t = migration.target - 1;
       if (t != active_extruder) migration_extruder = t;
@@ -1225,9 +1260,17 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
     else if (migration.automode && migration_extruder < migration.last && migration_extruder < EXTRUDERS - 1)
       migration_extruder++;
 
-    if (migration_extruder == active_extruder) return;
+    if (migration_extruder == active_extruder) {
+      #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+        SERIAL_ECHOLN("Migration source matches active");
+      #endif
+      return false;
+    }
 
     // Migration begins
+    #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+      SERIAL_ECHOLN("Beginning migration");
+    #endif
 
     migration.in_progress = true; // Prevent runout script
     planner.synchronize();
@@ -1244,13 +1287,15 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
     #endif
 
     // Migrate the temperature to the new hotend
-    #if HOTENDS > 1
-      thermalManager.setTargetHotend(thermalManager.degTargetHotend(active_extruder), migration_extruder);
-      #if HAS_DISPLAY
-        thermalManager.set_heating_message(0);
-      #endif
+    #if HAS_MULTI_HOTEND
+      thermalManager.setTargetHotend(thermalManager.temp_hotend[active_extruder].target, migration_extruder);
+      TERN_(AUTOTEMP, planner.autotemp_update());
+      TERN_(HAS_DISPLAY, thermalManager.set_heating_message(0));
       thermalManager.wait_for_hotend(active_extruder);
     #endif
+
+    // Migrate Linear Advance K factor to the new extruder
+    TERN_(LIN_ADVANCE, planner.extruder_advance_K[active_extruder] = planner.extruder_advance_K[migration_extruder]);
 
     // Perform the tool change
     tool_change(migration_extruder);
@@ -1271,6 +1316,10 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
     planner.synchronize();
     planner.set_e_position_mm(current_position.e); // New extruder primed and ready
+    #if ENABLED(DEBUG_TOOLCHANGE_MIGRATION_FEATURE)
+      SERIAL_ECHOLN("Migration Complete");
+    #endif
+    return true;
   }
 
 #endif // TOOLCHANGE_MIGRATION_FEATURE

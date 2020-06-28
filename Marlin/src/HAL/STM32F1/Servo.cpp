@@ -20,7 +20,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #ifdef __STM32F1__
 
 #include "../../inc/MarlinConfig.h"
@@ -30,7 +29,6 @@
 uint8_t ServoCount = 0;
 
 #include "Servo.h"
-#include "timers.h"
 
 //#include "Servo.h"
 

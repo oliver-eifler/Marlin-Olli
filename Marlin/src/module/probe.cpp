@@ -544,7 +544,7 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
 
     // Do a first probe at the fast speed
     if (try_to_probe(PSTR("FAST"), z_probe_low_point, MMM_TO_MMS(Z_PROBE_SPEED_FAST),
-                     sanity_check, _MAX(Z_CLEARANCE_BETWEEN_PROBES, 4) / 2) ) return NAN;
+                     sanity_check, Z_CLEARANCE_BETWEEN_PROBES) ) return NAN;
 
     const float first_probe_z = current_position.z;
 
@@ -565,14 +565,14 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
     }
   #endif
 
-  #ifdef EXTRA_PROBING
+  #if EXTRA_PROBING > 0
     float probes[TOTAL_PROBING];
   #endif
 
   #if TOTAL_PROBING > 2
     float probes_z_sum = 0;
     for (
-      #if EXTRA_PROBING
+      #if EXTRA_PROBING > 0
         uint8_t p = 0; p < TOTAL_PROBING; p++
       #else
         uint8_t p = TOTAL_PROBING; p--;
@@ -582,13 +582,13 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
     {
       // Probe downward slowly to find the bed
       if (try_to_probe(PSTR("SLOW"), z_probe_low_point, MMM_TO_MMS(Z_PROBE_SPEED_SLOW),
-                       sanity_check, _MAX(Z_CLEARANCE_MULTI_PROBE, 4) / 2) ) return NAN;
+                       sanity_check, Z_CLEARANCE_MULTI_PROBE) ) return NAN;
 
       TERN_(MEASURE_BACKLASH_WHEN_PROBING, backlash.measure_with_probe());
 
       const float z = current_position.z;
 
-      #if EXTRA_PROBING
+      #if EXTRA_PROBING > 0
         // Insert Z measurement into probes[]. Keep it sorted ascending.
         LOOP_LE_N(i, p) {                            // Iterate the saved Zs to insert the new Z
           if (i == p || probes[i] > z) {                              // Last index or new Z is smaller than this Z
@@ -605,14 +605,17 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
 
       #if TOTAL_PROBING > 2
         // Small Z raise after all but the last probe
-        if (TERN(EXTRA_PROBING, p < TOTAL_PROBING - 1, p))
-          do_blocking_move_to_z(z + Z_CLEARANCE_MULTI_PROBE, MMM_TO_MMS(Z_PROBE_SPEED_FAST));
+        if (p
+          #if EXTRA_PROBING > 0
+            < TOTAL_PROBING - 1
+          #endif
+        ) do_blocking_move_to_z(z + Z_CLEARANCE_MULTI_PROBE, MMM_TO_MMS(Z_PROBE_SPEED_FAST));
       #endif
     }
 
   #if TOTAL_PROBING > 2
 
-    #if EXTRA_PROBING
+    #if EXTRA_PROBING > 0
       // Take the center value (or average the two middle values) as the median
       static constexpr int PHALF = (TOTAL_PROBING - 1) / 2;
       const float middle = probes[PHALF],
@@ -712,11 +715,8 @@ float Probe::probe_at_point(const float &rx, const float &ry, const ProbePtRaise
     else if (raise_after == PROBE_PT_STOW)
       if (stow()) measured_z = NAN;   // Error on stow?
 
-    if (verbose_level > 2) {
-      SERIAL_ECHOPAIR_F("Bed X: ", LOGICAL_X_POSITION(rx), 3);
-      SERIAL_ECHOPAIR_F(   " Y: ", LOGICAL_Y_POSITION(ry), 3);
-      SERIAL_ECHOLNPAIR_F( " Z: ", measured_z, 3);
-    }
+    if (verbose_level > 2)
+      SERIAL_ECHOLNPAIR("Bed X: ", LOGICAL_X_POSITION(rx), " Y: ", LOGICAL_Y_POSITION(ry), " Z: ", measured_z);
   }
 
   feedrate_mm_s = old_feedrate_mm_s;
@@ -724,7 +724,9 @@ float Probe::probe_at_point(const float &rx, const float &ry, const ProbePtRaise
   if (isnan(measured_z)) {
     stow();
     LCD_MESSAGEPGM(MSG_LCD_PROBING_FAILED);
-    SERIAL_ERROR_MSG(STR_ERR_PROBING_FAILED);
+    #if DISABLED(G29_RETRY_AND_RECOVER)
+      SERIAL_ERROR_MSG(STR_ERR_PROBING_FAILED);
+    #endif
   }
 
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< Probe::probe_at_point");

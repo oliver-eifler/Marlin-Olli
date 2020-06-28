@@ -40,6 +40,10 @@ uint8_t PrintJobRecovery::queue_index_r;
 uint32_t PrintJobRecovery::cmd_sdpos, // = 0
          PrintJobRecovery::sdpos[BUFSIZE];
 
+#if ENABLED(DWIN_CREALITY_LCD)
+  bool PrintJobRecovery::dwin_flag; // = false
+#endif
+
 #include "../sd/cardreader.h"
 #include "../lcd/ultralcd.h"
 #include "../gcode/queue.h"
@@ -105,6 +109,7 @@ void PrintJobRecovery::check() {
     load();
     if (!valid()) return cancel();
     queue.inject_P(PSTR("M1000 S"));
+    TERN_(DWIN_CREALITY_LCD, dwin_flag = true);
   }
 }
 
@@ -185,7 +190,7 @@ void PrintJobRecovery::save(const bool force/*=false*/) {
       #if EXTRUDERS > 1
         for (int8_t e = 0; e < EXTRUDERS; e++) info.filament_size[e] = planner.filament_size[e];
       #else
-        if (parser.volumetric_enabled) info.filament_size = planner.filament_size[active_extruder];
+        if (parser.volumetric_enabled) info.filament_size[0] = planner.filament_size[active_extruder];
       #endif
     #endif
 
@@ -195,7 +200,7 @@ void PrintJobRecovery::save(const bool force/*=false*/) {
 
     TERN_(HAS_HEATED_BED, info.target_temperature_bed = thermalManager.temp_bed.target);
 
-    #if FAN_COUNT
+    #if HAS_FAN
       COPY(info.fan_speed, thermalManager.fan_speed);
     #endif
 
@@ -331,7 +336,7 @@ void PrintJobRecovery::resume() {
       }
     #else
       if (info.volumetric_enabled) {
-        dtostrf(info.filament_size, 1, 3, str_1);
+        dtostrf(info.filament_size[0], 1, 3, str_1);
         sprintf_P(cmd, PSTR("M200 D%s"), str_1);
         gcode.process_subcommands_now(cmd);
       }
@@ -467,7 +472,7 @@ void PrintJobRecovery::resume() {
         DEBUG_ECHOPGM("current_position: ");
         LOOP_XYZE(i) {
           if (i) DEBUG_CHAR(',');
-          DEBUG_ECHO(info.current_position[i]);
+          DEBUG_DECIMAL(info.current_position[i]);
         }
         DEBUG_EOL();
 
@@ -475,7 +480,7 @@ void PrintJobRecovery::resume() {
           DEBUG_ECHOPGM("home_offset: ");
           LOOP_XYZ(i) {
             if (i) DEBUG_CHAR(',');
-            DEBUG_ECHO(info.home_offset[i]);
+            DEBUG_DECIMAL(info.home_offset[i]);
           }
           DEBUG_EOL();
         #endif
@@ -484,7 +489,7 @@ void PrintJobRecovery::resume() {
           DEBUG_ECHOPGM("position_shift: ");
           LOOP_XYZ(i) {
             if (i) DEBUG_CHAR(',');
-            DEBUG_ECHO(info.position_shift[i]);
+            DEBUG_DECIMAL(info.position_shift[i]);
           }
           DEBUG_EOL();
         #endif
@@ -508,7 +513,7 @@ void PrintJobRecovery::resume() {
           DEBUG_ECHOLNPAIR("target_temperature_bed: ", info.target_temperature_bed);
         #endif
 
-        #if FAN_COUNT
+        #if HAS_FAN
           DEBUG_ECHOPGM("fan_speed: ");
           FANS_LOOP(i) {
             DEBUG_ECHO(int(info.fan_speed[i]));
