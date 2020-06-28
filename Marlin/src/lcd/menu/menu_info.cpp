@@ -242,6 +242,12 @@ void menu_info_board() {
     STATIC_ITEM_P(PSTR(STRING_DISTRIBUTION_DATE));              // YYYY-MM-DD HH:MM
     STATIC_ITEM_P(PSTR(MACHINE_NAME));                          // My3DPrinter
     STATIC_ITEM_P(PSTR(WEBSITE_URL));                           // www.my3dprinter.com
+    //Olli: Show build time
+    #if ENABLED(LCD_INFO_BUILDTIME)
+      STATIC_ITEM_P(PSTR("build-time"), SS_CENTER);             // build-time
+      STATIC_ITEM_P(PSTR(MARLIN_BUILD_TIMESTAMP));              // YYYY-MM-DD HH:MM:SS
+    #endif
+    //
     VALUE_ITEM_P(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
     #if HAS_LEVELING
       STATIC_ITEM(

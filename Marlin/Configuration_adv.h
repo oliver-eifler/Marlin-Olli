@@ -770,11 +770,11 @@
 //
 // Add the G35 command to read bed corners to help adjust screws.
 //
-//#define ASSISTED_TRAMMING
+#define ASSISTED_TRAMMING
 #if ENABLED(ASSISTED_TRAMMING)
 
   // Define positions for probing points, use the hotend as reference not the sensor.
-  #define TRAMMING_POINT_XY { {  20, 20 }, { 200,  20 }, { 200, 200 }, { 20, 200 } }
+  #define TRAMMING_POINT_XY { {  30, 30 }, { 220,  30 }, { 220, 220 }, { 30, 220 } }
 
   // Define positions names for probing points.
   #define TRAMMING_POINT_NAME_1 "Front-Left"
@@ -1043,6 +1043,12 @@
   #define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
     //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
+    #define LCD_INFO_BUILDTIME // //Olli: Show build time
+    #if ENABLED(LCD_INFO_BUILDTIME)
+      #ifndef MARLIN_BUILD_TIMESTAMP
+        #define MARLIN_BUILD_TIMESTAMP (__DATE__ " " __TIME__)  
+      #endif
+    #endif
   #endif
 
   // BACK menu items keep the highlight at the top
@@ -1839,14 +1845,14 @@
 #endif
 
 //OLLI: Little block_buffer magic ;)
-/*
+
 #if ENABLED(SLOWDOWN)
   #ifdef SLOWDOWN_DIVISOR
     #undef SLOWDOWN_DIVISOR
   #endif
   #define SLOWDOWN_DIVISOR (BLOCK_BUFFER_SIZE/8)
 #endif
-*/
+
 // @section serial
 
 // The ASCII buffer for serial input

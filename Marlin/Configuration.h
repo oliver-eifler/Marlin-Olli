@@ -132,11 +132,11 @@
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "Olli A20M"
+// #define CUSTOM_MACHINE_NAME "Olli A20M"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like http://www.uuidgenerator.net/version4
-#define MACHINE_UUID "9dfeeb18-b1f7-446f-9868-e2c6cb118ece"
+// #define MACHINE_UUID "9dfeeb18-b1f7-446f-9868-e2c6cb118ece"
 
 // @section extruder
 

@@ -46,7 +46,7 @@
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.
  */
-//#define MACHINE_NAME "Olli A20M"
+#define MACHINE_NAME "Olli A20M"
 
 /**
  * The SOURCE_CODE_URL is the location where users will find the Marlin Source
@@ -59,7 +59,7 @@
 /**
  * Default generic printer UUID.
  */
-//#define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
+#define DEFAULT_MACHINE_UUID "9dfeeb18-b1f7-446f-9868-e2c6cb118ece"
 
 /**
  * The WEBSITE_URL is the location where users can get more information such as
