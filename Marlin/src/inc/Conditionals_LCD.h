@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -121,10 +121,10 @@
   #define IS_U8GLIB_SSD1306
 
 #elif ENABLED(FYSETC_242_OLED_12864)
-      
+
   #define IS_RRD_SC
   #define U8GLIB_SH1106
-    
+
   #define LED_CONTROL_MENU
   #define NEOPIXEL_LED
   #undef NEOPIXEL_TYPE
@@ -136,7 +136,7 @@
   #ifndef NEOPIXEL_BRIGHTNESS
     #define NEOPIXEL_BRIGHTNESS 127
   #endif
-    
+
   #if ENABLED(PSU_CONTROL)
     #define LED_BACKLIGHT_TIMEOUT 10000
   #endif
@@ -255,13 +255,43 @@
   #define IS_ULTIPANEL
 #endif
 
+// FSMC/SPI TFT Panels (LVGL)
+#if EITHER(TFT_LVGL_UI_SPI, TFT_LVGL_UI_FSMC)
+  #define HAS_TFT_LVGL_UI 1
+#endif
+
 // FSMC/SPI TFT Panels
-#if ENABLED(FSMC_GRAPHICAL_TFT)
+#if EITHER(FSMC_GRAPHICAL_TFT, SPI_GRAPHICAL_TFT)
+  #define TFT_SCALED_DOGLCD 1
+#endif
+
+#if TFT_SCALED_DOGLCD
   #define DOGLCD
   #define IS_ULTIPANEL
   #define DELAYED_BACKLIGHT_INIT
-#elif ENABLED(SPI_GRAPHICAL_TFT)
+#elif ENABLED(TFT_LVGL_UI_SPI)
   #define DELAYED_BACKLIGHT_INIT
+#endif
+
+// FSMC/SPI TFT Panels (HAL STM32)
+#if EITHER(TFT_320x240, TFT_480x320)
+  #define HAS_FSMC_TFT 1
+#elif EITHER(TFT_320x240_SPI, TFT_480x320_SPI)
+  #define HAS_SPI_TFT 1
+#endif
+
+#if HAS_FSMC_TFT || HAS_SPI_TFT
+  #define HAS_GRAPHICAL_TFT 1
+  #define IS_ULTIPANEL
+#endif
+
+// Fewer lines with touch buttons on-screen
+#if EITHER(TFT_320x240, TFT_320x240_SPI)
+  #define HAS_UI_320x240 1
+  #define LCD_HEIGHT TERN(TOUCH_SCREEN, 6, 7)
+#elif EITHER(TFT_480x320, TFT_480x320_SPI)
+  #define HAS_UI_480x320 1
+  #define LCD_HEIGHT TERN(TOUCH_SCREEN, 6, 7)
 #endif
 
 /**
@@ -320,7 +350,7 @@
 #endif
 
 #ifndef STD_ENCODER_PULSES_PER_STEP
-  #if ENABLED(TOUCH_BUTTONS)
+  #if ENABLED(TOUCH_SCREEN)
     #define STD_ENCODER_PULSES_PER_STEP 2
   #else
     #define STD_ENCODER_PULSES_PER_STEP 5
@@ -389,14 +419,23 @@
 // Aliases for LCD features
 #if EITHER(ULTRA_LCD, EXTENSIBLE_UI)
   #define HAS_DISPLAY 1
-  #if ENABLED(ULTRA_LCD)
-    #define HAS_SPI_LCD 1
-    #if ENABLED(DOGLCD)
-      #define HAS_GRAPHICAL_LCD 1
-    #else
-      #define HAS_CHARACTER_LCD 1
-    #endif
+#endif
+
+#if ENABLED(ULTRA_LCD)
+  #define HAS_SPI_LCD 1
+  #if ENABLED(DOGLCD)
+    #define HAS_GRAPHICAL_LCD 1
+  #elif DISABLED(HAS_GRAPHICAL_TFT)
+    #define HAS_CHARACTER_LCD 1
   #endif
+#endif
+
+#if ENABLED(SR_LCD_3W_NL)
+  // Feature checks for SR_LCD_3W_NL
+#elif EITHER(LCD_I2C_TYPE_MCP23017, LCD_I2C_TYPE_MCP23008)
+  #define USES_LIQUIDTWI2
+#elif ANY(HAS_CHARACTER_LCD, LCD_I2C_TYPE_PCF8575, LCD_I2C_TYPE_PCA8574, SR_LCD_2W_NL, LCM1602)
+  #define USES_LIQUIDCRYSTAL
 #endif
 
 #if ENABLED(ULTIPANEL) && DISABLED(NO_LCD_MENUS)
@@ -589,14 +628,6 @@
   #define NUM_SERVOS 0
 #endif
 
-#ifndef PREHEAT_1_LABEL
-  #define PREHEAT_1_LABEL "PLA"
-#endif
-
-#ifndef PREHEAT_2_LABEL
-  #define PREHEAT_2_LABEL "ABS"
-#endif
-
 /**
  * Set a flag for a servo probe (or BLTouch)
  */
@@ -742,4 +773,11 @@
  */
 #ifndef EXTRUDE_MINTEMP
   #define EXTRUDE_MINTEMP 170
+#endif
+
+/**
+ * To check if we need the folder src/features/leds
+ */
+#if ANY(TEMP_STAT_LEDS, HAS_COLOR_LEDS, HAS_CASE_LIGHT, PRINTER_EVENT_LEDS, LED_BACKLIGHT_TIMEOUT, PCA9632_BUZZER, LED_CONTROL_MENU, NEOPIXEL_LED)
+  #define HAS_LED_FEATURE 1
 #endif
