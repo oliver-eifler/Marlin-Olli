@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -1654,7 +1654,7 @@ void Planner::synchronize() {
  *  extruder      - target extruder
  *  millimeters   - the length of the movement, if known
  *
- * Returns true if movement was properly queued, false otherwise
+ * Returns true if movement was properly queued, false otherwise (if cleaning)
  */
 bool Planner::_buffer_steps(const xyze_long_t &target
   #if HAS_POSITION_FLOAT
@@ -1833,7 +1833,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   #endif
 
   // Number of steps for each axis
-  // See http://www.corexy.com/theory.html
+  // See https://www.corexy.com/theory.html
   #if CORE_IS_XY
     block->steps.set(ABS(da + db), ABS(da - db), ABS(dc));
   #elif CORE_IS_XZ
@@ -2637,6 +2637,8 @@ void Planner::buffer_sync_block() {
  *  fr_mm_s     - (target) speed of the move
  *  extruder    - target extruder
  *  millimeters - the length of the movement, if known
+ *
+ * Return 'false' if no segment was queued due to cleaning, cold extrusion, full queue, etc.
  */
 bool Planner::buffer_segment(const float &a, const float &b, const float &c, const float &e
   #if HAS_DIST_MM_ARG
@@ -2706,7 +2708,7 @@ bool Planner::buffer_segment(const float &a, const float &b, const float &c, con
     SERIAL_ECHOLNPGM(")");
   //*/
 
-  // Queue the movement
+  // Queue the movement. Return 'false' if the move was not queued.
   if (!_buffer_steps(target
       #if HAS_POSITION_FLOAT
         , target_float
