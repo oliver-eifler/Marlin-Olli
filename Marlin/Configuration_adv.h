@@ -1057,6 +1057,8 @@
     #if ENABLED(LCD_INFO_BUILDTIME)
       #ifndef MARLIN_BUILD_TIMESTAMP
         #define MARLIN_BUILD_TIMESTAMP (__DATE__ " " __TIME__)  
+      #else
+        #define STR_SP_STR(A,B)   A " " B
       #endif
     #endif
   #endif
