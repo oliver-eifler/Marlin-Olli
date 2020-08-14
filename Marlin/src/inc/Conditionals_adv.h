@@ -388,3 +388,12 @@
 #if ANY(AUTO_BED_LEVELING_UBL, AUTO_BED_LEVELING_LINEAR, Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS)
   #define NEED_LSF 1
 #endif
+
+//Olli: Flag for i2c src/gcode/feature/i2c
+#if ANY(EXPERIMENTAL_I2CBUS_SCANNER,EXPERIMENTAL_I2CBUS)
+    #define HAS_I2CBUS_GCODE
+    #ifndef NEED_HEX_PRINT
+      #define NEED_HEX_PRINT 1
+    #endif
+  #endif
+  

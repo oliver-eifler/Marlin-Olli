@@ -3,7 +3,7 @@
 
 #if ANY(EXPERIMENTAL_I2CBUS_SCANNER, EXPERIMENTAL_I2CBUS)
 
-#include "../../../libs/hex_print_routines.h"
+#include "../../../libs/hex_print.h"
 #include "../../gcode.h"
 
 #include <Wire.h> // for i2c
