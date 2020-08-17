@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#include "W25Qxx.h"
+#include "../../../../libs/W25Qxx.h"
 
 #define HAS_SPI_FLASH_COMPRESSION 1
 
@@ -79,7 +79,7 @@ public:
   static void endWrite();
   static void writeData(uint8_t* data, uint16_t size);
 
-  static // Read operation
+  // Read operation
   static void beginRead(uint32_t startAddress);
   static void readData(uint8_t* data, uint16_t size);
 
