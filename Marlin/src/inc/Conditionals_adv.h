@@ -391,7 +391,7 @@
 
 //Olli: Flag for i2c src/gcode/feature/i2c
 #if ANY(EXPERIMENTAL_I2CBUS_SCANNER,EXPERIMENTAL_I2CBUS)
-    #define HAS_I2CBUS_GCODE
+    #define HAS_EXP_I2CBUS
     #ifndef NEED_HEX_PRINT
       #define NEED_HEX_PRINT 1
     #endif
