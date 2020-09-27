@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#ifndef STM32F4
+#if NOT_TARGET(STM32F4)
   #error "Oops! Select an STM32F4 board in 'Tools > Board.'"
 #elif HOTENDS > 3 || E_STEPPERS > 3
   #error "OLLI BTT SKR Pro V1.1 supports up to 3 hotends / E-steppers."
@@ -184,7 +184,7 @@
    * Hardware serial communication ports.
    * If undefined software serial is used according to the pins below
    */
-  //#define X_HARDWARE_SERIAL  Serial
+  //#define X_HARDWARE_SERIAL  Serial1
   //#define X2_HARDWARE_SERIAL Serial1
   //#define Y_HARDWARE_SERIAL  Serial1
   //#define Y2_HARDWARE_SERIAL Serial1
@@ -291,10 +291,7 @@
 #if HAS_SPI_LCD
   #define BEEPER_PIN                        PG4
   #define BTN_ENC                           PA8
-  #if SD_CONNECTION_IS(LCD)
-    #define SDSS                            PB12  // Uses default hardware SPI for LCD's SD
-  #endif
-
+  
   #if ENABLED(CR10_STOCKDISPLAY)
     #define LCD_PINS_RS                     PG6
 
