@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -257,9 +257,12 @@
 // Must use soft SPI because Marlin's default hardware SPI is tied to LCD's EXP2
 //
 #if SD_CONNECTION_IS(LCD)
+
   #define SD_DETECT_PIN                     PF12
   #define SDSS                              PB12
+
 #elif SD_CONNECTION_IS(ONBOARD)
+
   // The SKR Pro's ONBOARD SD interface is on SPI1.
   // Due to a pull resistor on the clock line, it needs to use SPI Data Mode 3 to
   // function with Hardware SPI. This is not currently configurable in the HAL,
@@ -270,8 +273,9 @@
   #define MISO_PIN                          PA6
   #define MOSI_PIN                          PB5
   #define SD_DETECT_PIN                     PB11
+
 #elif SD_CONNECTION_IS(CUSTOM_CABLE)
-  #define "CUSTOM_CABLE is not a supported SDCARD_CONNECTION for this board"
+  #error "CUSTOM_CABLE is not a supported SDCARD_CONNECTION for this board"
 #endif
 
 /**
@@ -288,11 +292,19 @@
 //
 // LCDs and Controllers
 //
-#if HAS_SPI_LCD
+#if IS_TFTGLCD_PANEL
+
+  #if ENABLED(TFTGLCD_PANEL_SPI)
+    #define TFTGLCD_CS                      PG10
+  #endif
+
+#elif HAS_WIRED_LCD
+
   #define BEEPER_PIN                        PG4
   #define BTN_ENC                           PA8
   
   #if ENABLED(CR10_STOCKDISPLAY)
+
     #define LCD_PINS_RS                     PG6
 
     #define BTN_EN1                         PD11
@@ -307,10 +319,12 @@
     #undef BOARD_ST7920_DELAY_3
 
   #elif ENABLED(MKS_MINI_12864)
+
     #define DOGLCD_A0                       PG6
     #define DOGLCD_CS                       PG3
     #define BTN_EN1                         PG10
     #define BTN_EN2                         PF11
+
   #else
 
     #define LCD_PINS_RS                     PD10
@@ -348,21 +362,21 @@
     #endif
 
   #endif
+  
+#endif // HAS_WIRED_LCD
 
-  // Alter timing for graphical display
-  #if HAS_GRAPHICAL_LCD
-    #ifndef BOARD_ST7920_DELAY_1
-      #define BOARD_ST7920_DELAY_1  DELAY_NS(96)
-    #endif
-    #ifndef BOARD_ST7920_DELAY_2
-      #define BOARD_ST7920_DELAY_2  DELAY_NS(48)
-    #endif
-    #ifndef BOARD_ST7920_DELAY_3
-      #define BOARD_ST7920_DELAY_3 DELAY_NS(600)
-    #endif
+// Alter timing for graphical display
+#if HAS_MARLINUI_U8GLIB
+  #ifndef BOARD_ST7920_DELAY_1
+    #define BOARD_ST7920_DELAY_1    DELAY_NS(96)
   #endif
-
-#endif // HAS_SPI_LCD
+  #ifndef BOARD_ST7920_DELAY_2
+    #define BOARD_ST7920_DELAY_2    DELAY_NS(48)
+  #endif
+  #ifndef BOARD_ST7920_DELAY_3
+    #define BOARD_ST7920_DELAY_3   DELAY_NS(600)
+  #endif
+#endif
 
 //
 // WIFI
