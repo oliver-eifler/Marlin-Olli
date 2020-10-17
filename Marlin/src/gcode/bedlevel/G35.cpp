@@ -110,9 +110,8 @@ void GcodeSuite::G35() {
     tool_change(0, true);
   #endif
 
-  #if HAS_DUPLICATION_MODE
-    extruder_duplication_enabled = false;
-  #endif
+  // Disable duplication mode on homing
+  TERN_(HAS_DUPLICATION_MODE, set_duplication_enabled(false));
 
   // Home all before this procedure
   home_all_axes();
@@ -157,9 +156,10 @@ void GcodeSuite::G35() {
       const int minutes = trunc(decimal_part * 60.0f);
 
       SERIAL_ECHOPAIR("Turn ", tramming_point_name[i],
-             " ", (screw_thread & 1) == (adjust > 0) ? "Counter-Clockwise" : "Clockwise",
+             " ", (screw_thread & 1) == (adjust > 0) ? "CCW" : "CW",
              " by ", abs(full_turns), " turns");
       if (minutes) SERIAL_ECHOPAIR(" and ", abs(minutes), " minutes");
+      if (ENABLED(REPORT_TRAMMING_MM)) SERIAL_ECHOPAIR(" (", -diff, "mm)");
       SERIAL_EOL();
     }
   }
