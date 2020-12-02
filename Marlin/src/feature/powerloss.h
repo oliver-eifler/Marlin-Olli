@@ -30,6 +30,10 @@
 
 #include "../inc/MarlinConfig.h"
 
+#if ENABLED(GCODE_REPEAT_MARKERS)
+  #include "../feature/repeat.h"
+#endif
+
 #if ENABLED(MIXING_EXTRUDER)
   #include "../feature/mixing.h"
 #endif
@@ -50,6 +54,8 @@ typedef struct {
   uint16_t feedrate;
   float zraise;
 
+  // Repeat information
+  TERN_(GCODE_REPEAT_MARKERS, Repeat stored_repeat);
 
   TERN_(HAS_HOME_OFFSET,    xyz_pos_t home_offset);
   TERN_(HAS_POSITION_SHIFT, xyz_pos_t position_shift);
@@ -120,12 +126,10 @@ class PrintJobRecovery {
 
     static inline void setup() {
       #if PIN_EXISTS(POWER_LOSS)
-        #if ENABLED(POWER_LOSS_PULL)
-          #if POWER_LOSS_STATE == LOW
-            SET_INPUT_PULLUP(POWER_LOSS_PIN);
-          #else
-            SET_INPUT_PULLDOWN(POWER_LOSS_PIN);
-          #endif
+        #if ENABLED(POWER_LOSS_PULLUP)
+          SET_INPUT_PULLUP(POWER_LOSS_PIN);
+        #elif ENABLED(POWER_LOSS_PULLDOWN)
+          SET_INPUT_PULLDOWN(POWER_LOSS_PIN);
         #else
           SET_INPUT(POWER_LOSS_PIN);
         #endif
