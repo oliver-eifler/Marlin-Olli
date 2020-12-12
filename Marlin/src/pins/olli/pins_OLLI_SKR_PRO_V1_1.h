@@ -29,6 +29,14 @@
 
 #define BOARD_INFO_NAME "OLLI BTT SKR Pro 1.1" // redefined?
 
+// BigTreeTech driver expansion module https://bit.ly/3ptRRoj
+//#define BTT_MOTOR_EXPANSION
+
+#if BOTH(HAS_WIRED_LCD, BTT_MOTOR_EXPANSION)
+  #error "It's not possible to have both LCD and motor expansion module on EXP1/EXP2."
+#endif
+
+
 
 // Use one of these or SDCard-based Emulation will be used
 #if NO_EEPROM_SELECTED
@@ -248,6 +256,7 @@
 //
 // Misc. Functions
 //
+
 #ifndef SDCARD_CONNECTION
   #define SDCARD_CONNECTION                  LCD
 #endif
