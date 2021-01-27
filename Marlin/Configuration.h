@@ -998,9 +998,9 @@
  *     O-- FRONT --+
  */
 //old olli-style
-#define X_PROBE_OFFSET -31
-#define Y_PROBE_OFFSET 10.5
-#define Z_PROBE_OFFSET -2.80
+#define X_PROBE_OFFSET -28
+#define Y_PROBE_OFFSET 45
+#define Z_PROBE_OFFSET 0
 
 #define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, Z_PROBE_OFFSET }
 
@@ -1137,7 +1137,7 @@
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR true
-#define INVERT_Y_DIR true
+#define INVERT_Y_DIR false
 #define INVERT_Z_DIR true
 
 // @section extruder
@@ -1172,16 +1172,16 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 220
-#define Y_BED_SIZE 220
+#define X_BED_SIZE 210
+#define Y_BED_SIZE 210
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
-#define Y_MIN_POS 0
+#define X_MIN_POS -63-5
+#define Y_MIN_POS -60-5
 #define Z_MIN_POS 0
-#define X_MAX_POS 330 
-#define Y_MAX_POS 330
-#define Z_MAX_POS 250
+#define X_MAX_POS 255
+#define Y_MAX_POS 265
+#define Z_MAX_POS 213 //hardware work in progress
 
 /**
  * Software Endstops
@@ -1904,7 +1904,7 @@
 //
 //  Set this option if CLOCKWISE causes values to DECREASE
 //
-//#define REVERSE_ENCODER_DIRECTION
+#define REVERSE_ENCODER_DIRECTION
 
 //
 // This option reverses the encoder direction for navigating LCD menus.
