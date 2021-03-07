@@ -20,10 +20,13 @@
  *
  */
 #pragma once
-
-#if NOT_TARGET(STM32F4)
+#if NOT_TARGET(STM32F4) && (DISABLED(ALLOW_STM32DUINO) || NOT_TARGET(STM32F4xx))
   #error "Oops! Select an STM32F4 board in 'Tools > Board.'"
-#elif HOTENDS > 3 || E_STEPPERS > 3
+#endif
+
+#undef ALLOW_STM32DUINO
+
+#if HOTENDS > 3 || E_STEPPERS > 3
   #error "OLLI BTT SKR Pro V1.1 supports up to 3 hotends / E-steppers."
 #endif
 
