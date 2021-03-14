@@ -543,6 +543,13 @@
   #define HAS_USER_ITEM(N) 0
 #endif
 
+#if !HAS_MULTI_SERIAL
+  #undef MEATPACK_ON_SERIAL_PORT_2
+#endif
+#if EITHER(MEATPACK_ON_SERIAL_PORT_1, MEATPACK_ON_SERIAL_PORT_2)
+  #define HAS_MEATPACK 1
+#endif
+
 //Olli: Flag for i2c src/gcode/feature/i2c
 #if ANY(EXPERIMENTAL_I2CBUS_SCANNER,EXPERIMENTAL_I2CBUS)
     #define HAS_EXP_I2CBUS
