@@ -667,7 +667,7 @@
 //
 
 #elif MB(OLLI_SKR_PRO_V1_1)
-  #include "olli/pins_OLLI_SKR_PRO_V1_1.h"      // STM32F4                                env:BIGTREE_SKR_PRO
+  #include "olli/pins_OLLI_SKR_PRO_V1_1.h"      // STM32F4                                env:BIGTREE_SKR_PRO env:BIGTREE_SKR_PRO_usb_flash_drive
 
 
 
