@@ -2215,8 +2215,11 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
 #endif
 
 /**
- * Software Reset on Kill option
+ * Software Reset options
  */
+#if ENABLED(SOFT_RESET_VIA_SERIAL) && DISABLED(EMERGENCY_PARSER)
+  #error "EMERGENCY_PARSER is required to activate SOFT_RESET_VIA_SERIAL."
+#endif
 #if ENABLED(SOFT_RESET_ON_KILL) && !BUTTON_EXISTS(ENC)
   #error "An encoder button is required or SOFT_RESET_ON_KILL will reset the printer without notice!"
 #endif
@@ -2356,7 +2359,7 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
   + ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER) \
   + (ENABLED(U8GLIB_SSD1306) && DISABLED(IS_U8GLIB_SSD1306)) \
   + (ENABLED(MINIPANEL) && NONE(MKS_MINI_12864, ENDER2_STOCKDISPLAY)) \
-  + (ENABLED(MKS_MINI_12864) && DISABLED(MKS_LCD12864)) \
+  + (ENABLED(MKS_MINI_12864) && NONE(MKS_LCD12864A, MKS_LCD12864B)) \
   + (ENABLED(EXTENSIBLE_UI) && DISABLED(IS_EXTUI)) \
   + (DISABLED(IS_LEGACY_TFT) && ENABLED(TFT_GENERIC)) \
   + (ENABLED(IS_LEGACY_TFT) && COUNT_ENABLED(TFT_320x240, TFT_320x240_SPI, TFT_480x320, TFT_480x320_SPI)) \
@@ -2387,7 +2390,8 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
   + ENABLED(MAKRPANEL) \
   + ENABLED(MALYAN_LCD) \
   + ENABLED(NEXTION_TFT) \
-  + ENABLED(MKS_LCD12864) \
+  + ENABLED(MKS_LCD12864A) \
+  + ENABLED(MKS_LCD12864B) \
   + ENABLED(OLED_PANEL_TINYBOY2) \
   + ENABLED(OVERLORD_OLED) \
   + ENABLED(PANEL_ONE) \

@@ -1507,6 +1507,8 @@
   //#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5 // When the nozzle is off the mesh, this value is used
                                           // as the Z-Height correction value.
 
+  //#define UBL_MESH_WIZARD         // Run several commands in a row to get a complete mesh
+
 #elif ENABLED(MESH_BED_LEVELING)
 
   //===========================================================================
@@ -2274,7 +2276,8 @@
 // MKS LCD12864A/B with graphic controller and SD support. Follows MKS_MINI_12864 pinout.
 // https://www.aliexpress.com/item/33018110072.html
 //
-//#define MKS_LCD12864
+//#define MKS_LCD12864A
+//#define MKS_LCD12864B
 
 //
 // FYSETC variant of the MINI12864 graphic controller with SD support
