@@ -543,4 +543,7 @@
       #define NEED_HEX_PRINT 1
     #endif
   #endif
-
+//Olli; no software serial in tmcstepper lib  
+#if !ANY_AXIS_HAS(RXTX) && ANY_AXIS_HAS(SPI)
+  #define HAS_TMCNOSWSERIAL 1
+#endif
