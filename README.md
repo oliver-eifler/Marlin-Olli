@@ -10,6 +10,17 @@
 Additional documentation can be found at the [Marlin Home Page](https://marlinfw.org/).
 Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
 
+## Marlin-Olli fork - for Olli Printers
+
+<img align = left width=128 src="https://oliver-eifler.github.io/svg/olli-f3.svg">
+
+forked from [MarlinFirmware/Marlin](https://github.com/MarlinFirmware/Marlin)
+### olli-mk1-skrpro for Olli Dozer Printer Branch
+
+__Not for production use. Use with caution!__
+
+uses [forked TMCStepper](https://github.com/oliver-eifler/TMCStepper). Copy it to your ../lib/ folder.
+
 ## Marlin 2.0 Bugfix Branch
 
 __Not for production use. Use with caution!__
