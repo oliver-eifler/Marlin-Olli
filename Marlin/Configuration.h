@@ -1072,7 +1072,7 @@
  *     O-- FRONT --+
  */
 //old olli-style
-#define X_PROBE_OFFSET 0
+#define X_PROBE_OFFSET -33
 #define Y_PROBE_OFFSET 0
 #define Z_PROBE_OFFSET 0
 
@@ -1144,7 +1144,7 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_DEPLOY_PROBE    5 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
 #define Z_CLEARANCE_MULTI_PROBE     2 // Z Clearance between multiple probes
 #define Z_AFTER_PROBING           5 // Z position after probing is done
@@ -1239,10 +1239,10 @@
  */
 //#define Z_IDLE_HEIGHT Z_HOME_POS
 
-#define Z_HOMING_HEIGHT  0//10     // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
-                                  // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
+#define Z_HOMING_HEIGHT  10     // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
+                                // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
-#define Z_AFTER_HOMING  0//5      // (mm) Height to move to after homing Z
+#define Z_AFTER_HOMING   5      // (mm) Height to move to after homing Z
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
@@ -1257,11 +1257,11 @@
 #define Y_BED_SIZE 210
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
-#define Y_MIN_POS 0
+#define X_MIN_POS -47-5
+#define Y_MIN_POS -85-5
 #define Z_MIN_POS 0
-#define X_MAX_POS 340
-#define Y_MAX_POS 340
+#define X_MAX_POS X_MIN_POS+340
+#define Y_MAX_POS Y_MIN_POS+340
 #define Z_MAX_POS 215 //hardware work in progress
 
 /**
@@ -1290,7 +1290,7 @@
 #endif
 
 #if EITHER(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
-  //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
+  #define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
 #endif
 
 /**
@@ -1539,7 +1539,7 @@
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
-//#define LCD_BED_LEVELING
+#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
