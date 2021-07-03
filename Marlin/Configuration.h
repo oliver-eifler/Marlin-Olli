@@ -1161,9 +1161,9 @@
  *     O-- FRONT --+
  */
 //old olli-style
-#define X_PROBE_OFFSET -33
-#define Y_PROBE_OFFSET 0
-#define Z_PROBE_OFFSET -3.2
+#define X_PROBE_OFFSET 33
+#define Y_PROBE_OFFSET 2
+#define Z_PROBE_OFFSET -1.4
 
 #define NOZZLE_TO_PROBE_OFFSET { X_PROBE_OFFSET,Y_PROBE_OFFSET, Z_PROBE_OFFSET }
 
@@ -1359,8 +1359,8 @@
 #define Y_BED_SIZE 210
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -47-5
-#define Y_MIN_POS -85-5
+#define X_MIN_POS -65-5
+#define Y_MIN_POS -87-5
 #define Z_MIN_POS 0
 #define X_MAX_POS X_MIN_POS+340
 #define Y_MAX_POS Y_MIN_POS+340
