@@ -581,9 +581,10 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp 29.66
-    #define DEFAULT_Ki 3.17
-    #define DEFAULT_Kd 69.40
+    //50Watt-12V Heater Sunon 'Jump Jet Harrier' part cooling fan
+    #define DEFAULT_Kp  55.60  //29.66
+    #define DEFAULT_Ki   6.16 //3.17
+    #define DEFAULT_Kd 125.80  //69.40
   #endif
 #endif // PIDTEMP
 
